@@ -32,6 +32,8 @@ export const login: Handler = async (req, res) => {
         .json({ message: "Incorrect password", success: false });
     }
     const { accessToken, refreshToken } = user.generateAccessAndRefreshToken();
+    user.refreshToken = refreshToken;
+    await user.save({validateBeforeSave:false})
     const cookieOptions: CookieOptions = {
       sameSite: "none",
       secure: true,

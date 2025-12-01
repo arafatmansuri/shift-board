@@ -41,9 +41,15 @@ export const createShift: Handler = async (req, res) => {
       });
       return;
     }
-    const hasShiftOnSameDate = await Shift.find({
-      date,
+    const employeeShifts = await Shift.find({
       employeeId: employee._id,
+    });
+    const hasShiftOnSameDate = employeeShifts.filter((s) => {
+      const existingshiftDate = new Date(s.date);
+      if (existingshiftDate.getDate() == date.getDate()) {
+        return true;
+      }
+      return false;
     });
     if (hasShiftOnSameDate) {
       const currentStartTime = timeToMinutes(startTime);
@@ -134,9 +140,15 @@ export const updateShift: Handler = async (req, res) => {
       });
       return;
     }
-    const hasShiftOnSameDate = await Shift.find({
-      date,
+    const employeeShifts = await Shift.find({
       employeeId: employee._id,
+    });
+    const hasShiftOnSameDate = employeeShifts.filter((s) => {
+      const existingshiftDate = new Date(s.date);
+      if (existingshiftDate.getDate() == date.getDate()) {
+        return true;
+      }
+      return false;
     });
     if (hasShiftOnSameDate) {
       const currentStartTime = timeToMinutes(startTime);
@@ -183,3 +195,58 @@ export const updateShift: Handler = async (req, res) => {
     return;
   }
 };
+
+export const getAllShifts: Handler = async (req, res) => {
+  try {
+    const { employee, date } = req.query;
+    let shifts = await Shift.find();
+    if (employee && !date) {
+      shifts = await Shift.find({ employeeId: employee });
+    } else if (!employee && date) {
+      shifts = (await Shift.find()).filter((s) => {
+        const existingshiftDate = new Date(s.date);
+        const currentDate = new Date(date as string);
+        if (existingshiftDate.getDate() == currentDate.getDate()) {
+          return true;
+        }
+        return false;
+      });
+    } else if (employee && date) {
+      shifts = (await Shift.find({ employeeId: employee })).filter((s) => {
+        const existingshiftDate = new Date(s.date);
+        const currentDate = new Date(date as string);
+        if (existingshiftDate.getDate() == currentDate.getDate()) {
+          return true;
+        }
+        return false;
+      });
+    }
+    res
+      .status(StatusCode.Success)
+      .json({ message: "shifts fetched successfully", success: true, shifts });
+    return;
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
+};
+export const getEmployeeShifts: Handler = async (req, res) => {
+  try {
+    const id = req._id;
+    let shifts = await Shift.find({employeeId:id});
+    res
+      .status(StatusCode.Success)
+      .json({ message: "shifts fetched successfully", success: true, shifts });
+    return;
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
+};
+

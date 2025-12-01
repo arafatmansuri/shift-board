@@ -2,6 +2,8 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import authRouter from "./routes/authRoutes";
+import shiftRouter from "./routes/shiftRoutes";
+import employeeRouter from "./routes/employee";
 const app = express();
 
 app.use(express.json());
@@ -13,5 +15,7 @@ app.get("/api/health-check", (req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+app.use("/api/shift", shiftRouter);
+app.use("/api/employee",employeeRouter);
 
 export default app;
