@@ -69,15 +69,112 @@ export const createShift: Handler = async (req, res) => {
       startTime,
       endTime,
       employeeId: employee._id,
-    })
-    res
-      .status(StatusCode.Created)
-      .json({
-        message: "Shift created successfully",
-        success: true,
-        shift: await shift.populate("employeeId"),
+    });
+    res.status(StatusCode.Created).json({
+      message: "Shift created successfully",
+      success: true,
+      shift: await shift.populate("employeeId"),
+    });
+    return;
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
+};
+export const deleteShift: Handler = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const shift = await Shift.findByIdAndDelete(id);
+    if (!shift) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "shift not found", success: false });
+      return;
+    }
+    res.status(StatusCode.Success).json({
+      message: "Shift deleted successfully",
+      success: true,
+    });
+    return;
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
+};
+export const updateShift: Handler = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const shiftParse = shiftSchema.safeParse(req.body);
+    if (!shiftParse.success) {
+      res.status(StatusCode.InputError).json({
+        message: shiftParse.error.issues[0].message || "Invalid shift data",
+        success: false,
       });
-
+      return;
+    }
+    const { date, employeeId, endTime, startTime } = shiftParse.data;
+    const employee = await User.findById(employeeId);
+    if (!employee) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "employee not found", success: false });
+      return;
+    }
+    const shiftDuration = calculateDuration(startTime, endTime);
+    if (shiftDuration < 240) {
+      res.status(StatusCode.InputError).json({
+        message: "Shift must be greater than 4 hours",
+        success: false,
+      });
+      return;
+    }
+    const hasShiftOnSameDate = await Shift.find({
+      date,
+      employeeId: employee._id,
+    });
+    if (hasShiftOnSameDate) {
+      const currentStartTime = timeToMinutes(startTime);
+      const currentEndTime = timeToMinutes(endTime);
+      for (const shift of hasShiftOnSameDate) {
+        const shiftStartTime = timeToMinutes(shift.startTime || "");
+        const shiftEndTime = timeToMinutes(shift.endTime || "");
+        if (
+          !(
+            currentStartTime >= shiftEndTime || currentEndTime <= shiftStartTime
+          )
+        ) {
+          res.status(StatusCode.InputError).json({
+            message: "Employee has overlapping shift on this date",
+            success: false,
+          });
+          return;
+        }
+      }
+    }
+    const shift = await Shift.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          date,
+          startTime,
+          endTime,
+          employeeId: employee._id,
+        },
+      },
+      { new: true }
+    ).populate("employeeId");
+    res.status(StatusCode.Created).json({
+      message: "Shift created successfully",
+      success: true,
+      shift,
+    });
+    return;
   } catch (error) {
     res.status(StatusCode.ServerError).json({
       message: "Something went wrong from our side",
