@@ -52,3 +52,24 @@ export const login: Handler = async (req, res) => {
     return;
   }
 };
+export const me: Handler = async (req, res) => {
+  try {
+    const _id = req._id;
+    const user = await User.findById(_id);
+    if (!user) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "user not found", success: false });
+      return;
+    }
+    res
+      .status(StatusCode.Success)
+      .json({ message: "User data fetched successfully", user });
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
+};
