@@ -12,13 +12,13 @@ export const login: Handler = async (req, res) => {
     const loginParse = loginSchema.safeParse(req.body);
     if (!loginParse.success) {
       res.status(StatusCode.InputError).json({
-        message: loginParse.error.message || "Invalid username/password",
+        message: loginParse.error.issues[0].message || "Invalid username/password",
         success: false,
       });
       return;
     }
     const { password, email, username } = loginParse.data;
-    const user = await User.findOne({ $or: [{ email, username }] });
+    const user = await User.findOne({ $or: [{ email }, { username }] });
     if (!user) {
       res
         .status(StatusCode.NotFound)

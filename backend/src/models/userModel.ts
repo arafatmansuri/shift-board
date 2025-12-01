@@ -7,6 +7,8 @@ const UserSchema = new Schema(
     password: { type: String },
     email: { type: String, required: true, unique: true },
     role: { type: String, enum: ["employee", "admin"], default: "employee" },
+    employeeCode:{type:String,unique:true},
+    department:{type:Schema.Types.ObjectId,ref:"Department"},
     refreshToken: { type: String },
   },
   {
