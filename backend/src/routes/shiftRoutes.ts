@@ -13,7 +13,7 @@ import {
 
 const shiftRouter = Router();
 
-shiftRouter.route("/employeeshift").get(employeeMiddelware, getEmployeeShifts);
+shiftRouter.route("/employeeshift/:id").get(employeeMiddelware, getEmployeeShifts);
 shiftRouter.use(adminMiddelware);
 shiftRouter.route("/shifts").post(createShift);
 shiftRouter.route("/delete/:id").delete(deleteShift);

@@ -8,9 +8,7 @@ import {
 import { Handler, StatusCode } from "../types";
 const shiftSchema = z.object({
   employeeId: z.string({ error: "Invalid employeeId" }),
-  date: z
-    .date({ error: "Invalid shift date" })
-    .min(Date.now(), { error: "Invalid Date" }),
+  date: z.iso.date({ error: "Invalid shift date" }),
   startTime: z.string("Invalid start time"),
   endTime: z.string("Invalid end time"),
 });
@@ -46,7 +44,8 @@ export const createShift: Handler = async (req, res) => {
     });
     const hasShiftOnSameDate = employeeShifts.filter((s) => {
       const existingshiftDate = new Date(s.date);
-      if (existingshiftDate.getDate() == date.getDate()) {
+      const currentShiftDate = new Date(date);
+      if (existingshiftDate.getDate() == currentShiftDate.getDate()) {
         return true;
       }
       return false;
@@ -79,12 +78,12 @@ export const createShift: Handler = async (req, res) => {
     res.status(StatusCode.Created).json({
       message: "Shift created successfully",
       success: true,
-      shift: await shift.populate("employeeId"),
+      shift,
     });
     return;
-  } catch (error) {
+  } catch (error: any) {
     res.status(StatusCode.ServerError).json({
-      message: "Something went wrong from our side",
+      message: error.message || "Something went wrong from our side",
       success: false,
     });
     return;
@@ -145,7 +144,8 @@ export const updateShift: Handler = async (req, res) => {
     });
     const hasShiftOnSameDate = employeeShifts.filter((s) => {
       const existingshiftDate = new Date(s.date);
-      if (existingshiftDate.getDate() == date.getDate()) {
+      const currentShiftDate = new Date(date);
+      if (existingshiftDate.getDate() == currentShiftDate.getDate()) {
         return true;
       }
       return false;
@@ -199,9 +199,11 @@ export const updateShift: Handler = async (req, res) => {
 export const getAllShifts: Handler = async (req, res) => {
   try {
     const { employee, date } = req.query;
-    let shifts = await Shift.find();
+    let shifts = await Shift.find().populate("employeeId");
     if (employee && !date) {
-      shifts = await Shift.find({ employeeId: employee });
+      shifts = await Shift.find({ employeeId: employee }).populate(
+        "employeeId"
+      );
     } else if (!employee && date) {
       shifts = (await Shift.find()).filter((s) => {
         const existingshiftDate = new Date(s.date);
@@ -225,9 +227,9 @@ export const getAllShifts: Handler = async (req, res) => {
       .status(StatusCode.Success)
       .json({ message: "shifts fetched successfully", success: true, shifts });
     return;
-  } catch (error) {
+  } catch (error: any) {
     res.status(StatusCode.ServerError).json({
-      message: "Something went wrong from our side",
+      message: error.message || "Something went wrong from our side",
       success: false,
     });
     return;
@@ -236,7 +238,7 @@ export const getAllShifts: Handler = async (req, res) => {
 export const getEmployeeShifts: Handler = async (req, res) => {
   try {
     const id = req._id;
-    let shifts = await Shift.find({employeeId:id});
+    let shifts = await Shift.find({ employeeId: id });
     res
       .status(StatusCode.Success)
       .json({ message: "shifts fetched successfully", success: true, shifts });
@@ -249,4 +251,3 @@ export const getEmployeeShifts: Handler = async (req, res) => {
     return;
   }
 };
-

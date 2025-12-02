@@ -3,7 +3,7 @@ import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
 const departmentSchema = z.object({
-  departmentName:z.string().min(3,{error:"Department name is too short"}),
+  departmentName:z.string().min(2,{error:"Department name is too short"}),
   departmentCode:z.string(),
   departmentManager:z.string()
 })
@@ -75,7 +75,7 @@ export const deleteDepartment:Handler = async (req,res) => {
       res
         .status(StatusCode.Success)
         .json({
-          message: "Departments fetched sucessfully",
+          message: "Departments deleted sucessfully",
           success: true,
         });
       return

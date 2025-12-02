@@ -12,7 +12,8 @@ export const login: Handler = async (req, res) => {
     const loginParse = loginSchema.safeParse(req.body);
     if (!loginParse.success) {
       res.status(StatusCode.InputError).json({
-        message: loginParse.error.issues[0].message || "Invalid username/password",
+        message:
+          loginParse.error.issues[0].message || "Invalid username/password",
         success: false,
       });
       return;
@@ -32,8 +33,11 @@ export const login: Handler = async (req, res) => {
         .json({ message: "Incorrect password", success: false });
     }
     const { accessToken, refreshToken } = user.generateAccessAndRefreshToken();
-    user.refreshToken = refreshToken;
-    await user.save({validateBeforeSave:false})
+    await User.findByIdAndUpdate(user._id, {
+      $set: {
+        refreshToken,
+      },
+    });
     const cookieOptions: CookieOptions = {
       sameSite: "none",
       secure: true,
@@ -47,17 +51,18 @@ export const login: Handler = async (req, res) => {
       .status(StatusCode.Success)
       .json({ message: "login successfull", success: true, user });
     return;
-  } catch (error) {
-    res
-      .status(StatusCode.ServerError)
-      .json({ message: "Something went wrong from our side", success: false });
+  } catch (error: any) {
+    res.status(StatusCode.ServerError).json({
+      message: error.message || "Something went wrong from our side",
+      success: false,
+    });
     return;
   }
 };
 export const me: Handler = async (req, res) => {
   try {
     const _id = req._id;
-    const user = await User.findById(_id);
+    const user = await User.findById(_id).populate("department");
     if (!user) {
       res
         .status(StatusCode.NotFound)
