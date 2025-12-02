@@ -1,12 +1,11 @@
-import mongoose from "mongoose";
-import { z } from "zod";
-import { ITags } from "../../types";
+import { Types } from "mongoose";
+
 //Custom Request Objects:
 declare global {
   namespace Express {
     interface Request {
-      _id?: mongoose.Types.ObjectId;
-      role?:string;
+      _id?: Types.ObjectId;
+      role?: string;
     }
   }
 }

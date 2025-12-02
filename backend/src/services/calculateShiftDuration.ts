@@ -8,4 +8,3 @@ export const calculateDuration = (startTime:string, endTime:string):number => {
   const endMinutes = timeToMinutes(endTime);
   return endMinutes - startMinutes;
 };
-    
