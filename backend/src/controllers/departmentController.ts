@@ -65,11 +65,13 @@ export const deleteDepartment:Handler = async (req,res) => {
     try {
       const id = req.params.id;
       const department = await Department.findByIdAndDelete(id);
-      if(!department)
+      if(!department){
         res.status(StatusCode.NotFound).json({
           message: "Department not found",
           success: false,
         });
+        return
+      }
       res
         .status(StatusCode.Success)
         .json({
