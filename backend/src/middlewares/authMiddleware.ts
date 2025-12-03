@@ -33,8 +33,8 @@ export const employeeMiddelware: MHandler = async (req, res, next) => {
     next();
   } catch (error) {
     res
-      .status(StatusCode.ServerError)
-      .json({ message: "Something went wrong from our side", success: false });
+      .status(StatusCode.Unauthorized)
+      .json({ message: "Unauthorized", success: false });
     return;
   }
 };
@@ -70,8 +70,8 @@ export const adminMiddelware: MHandler = async (req, res, next) => {
     next();
   } catch (error) {
     res
-      .status(StatusCode.ServerError)
-      .json({ message: "Something went wrong from our side", success: false });
+      .status(StatusCode.Unauthorized)
+      .json({ message: "Unauthorized", success: false });
     return;
   }
 };

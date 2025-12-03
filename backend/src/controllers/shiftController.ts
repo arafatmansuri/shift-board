@@ -205,7 +205,7 @@ export const getAllShifts: Handler = async (req, res) => {
         "employeeId"
       );
     } else if (!employee && date) {
-      shifts = (await Shift.find()).filter((s) => {
+      shifts = (await Shift.find().populate("employeeId")).filter((s) => {
         const existingshiftDate = new Date(s.date);
         const currentDate = new Date(date as string);
         if (existingshiftDate.getDate() == currentDate.getDate()) {
@@ -214,7 +214,9 @@ export const getAllShifts: Handler = async (req, res) => {
         return false;
       });
     } else if (employee && date) {
-      shifts = (await Shift.find({ employeeId: employee })).filter((s) => {
+      shifts = (
+        await Shift.find({ employeeId: employee }).populate("employeeId")
+      ).filter((s) => {
         const existingshiftDate = new Date(s.date);
         const currentDate = new Date(date as string);
         if (existingshiftDate.getDate() == currentDate.getDate()) {

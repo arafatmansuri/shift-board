@@ -7,8 +7,8 @@ const UserSchema = new Schema(
     password: { type: String },
     email: { type: String, required: true, unique: true },
     role: { type: String, enum: ["employee", "admin"], default: "employee" },
-    employeeCode:{type:String,unique:true},
-    department:{type:Schema.Types.ObjectId,ref:"Department"},
+    employeeCode: { type: String, unique: true },
+    department: { type: Schema.Types.ObjectId, ref: "Department" },
     refreshToken: { type: String },
   },
   {
@@ -24,7 +24,7 @@ const UserSchema = new Schema(
         const accessToken = jwt.sign(
           { _id: this._id, username: this.username },
           <string>process.env.JWT_ACCESS_TOKEN_SECRET,
-          { expiresIn: "15m" }
+          { expiresIn: "1d" }
         );
         const refreshToken = jwt.sign(
           { _id: this._id, username: this.username },

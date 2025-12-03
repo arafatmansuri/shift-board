@@ -1,7 +1,7 @@
 import z from "zod";
+import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
-import { Department } from "../models/departmentModel";
 const employeeSchema = z.object({
   username: z.string().min(3, { error: "Username is too short" }),
   password: z
@@ -19,44 +19,60 @@ const employeeSchema = z.object({
       message: "Pasword should include atlist 1 special character",
     })
     .min(8, { message: "Password length shouldn't be less than 8" }),
-   email: z.email({error:"Email address is invalid"}),
-   employeeCode: z.string(),
-   department: z.string()
+  email: z.email({ error: "Email address is invalid" }),
+  employeeCode: z.string(),
+  department: z.string(),
 });
 export const createEmployee: Handler = async (req, res) => {
-    try {
-      const parsedEmployee = employeeSchema.safeParse(req.body);
-      if (!parsedEmployee.success) {
-        res.status(StatusCode.InputError).json({message:parsedEmployee.error.issues[0].message,success:false});
-        return;
-      }
-      const {email,employeeCode,password,username} = parsedEmployee.data;
-      const department = await Department.findById(parsedEmployee.data.department);
-      if (!department) {
-        res.status(StatusCode.NotFound).json({message:"Department not found",success:false})
-        return
-      }
-      const employee = await User.create({
-        department:department._id,
-        email,
-        employeeCode,
-        password,
-        role:"employee",
-        username
-      });
-      res.status(StatusCode.Created).json({
-        message: "Employee created sucessfully",
-        success: true,
-        employee,
-      });
-      return;
-    } catch (error) {
-      res.status(StatusCode.ServerError).json({
-        message: "Something went wrong from our side",
+  try {
+    const parsedEmployee = employeeSchema.safeParse(req.body);
+    if (!parsedEmployee.success) {
+      res.status(StatusCode.InputError).json({
+        message: parsedEmployee.error.issues[0].message,
         success: false,
       });
       return;
     }
+    const { email, employeeCode, password, username } = parsedEmployee.data;
+    const employeeData = await User.findOne({
+      $or: [{ email }, { employeeCode }, { username }],
+    });
+    if (employeeData) {
+      res
+        .status(StatusCode.InputError)
+        .json({ message: "Employee already exists", success: false });
+      return;
+    }
+    const department = await Department.findById(
+      parsedEmployee.data.department
+    );
+    if (!department) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Department not found", success: false });
+      return;
+    }
+    const employee = await User.create({
+      department: department._id,
+      email,
+      employeeCode,
+      password,
+      role: "employee",
+      username,
+    });
+    res.status(StatusCode.Created).json({
+      message: "Employee created sucessfully",
+      success: true,
+      employee,
+    });
+    return;
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+    });
+    return;
+  }
 };
 export const getAllEmployee: Handler = async (req, res) => {
   try {

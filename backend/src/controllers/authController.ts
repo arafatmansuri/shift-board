@@ -1,4 +1,5 @@
 import { CookieOptions } from "express";
+import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
@@ -77,6 +78,67 @@ export const me: Handler = async (req, res) => {
       message: "Something went wrong from our side",
       success: false,
     });
+    return;
+  }
+};
+export const refreshAccessToken: Handler = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      res
+        .status(StatusCode.Unauthorized)
+        .json({ message: "Unauthorized", success: false });
+      return;
+    }
+    const decodedRefreshToken = jwt.verify(
+      refreshToken,
+      <string>process.env.JWT_REFRESH_TOKEN_SECRET
+    );
+    if (!decodedRefreshToken) {
+      res
+        .status(StatusCode.Unauthorized)
+        .json({ message: "Unauthorized", success: false });
+      return;
+    }
+    //@ts-ignore
+    const user = await User.findById(decodedRefreshToken._id);
+    if (!user) {
+      res
+        .status(StatusCode.Unauthorized)
+        .json({ message: "Unauthorized", success: false });
+      return;
+    }
+    const { accessToken } = user.generateAccessAndRefreshToken();
+    const cookieOptions: CookieOptions = {
+      sameSite: "none",
+      secure: true,
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    };
+    res
+      .cookie("accessToken", accessToken, cookieOptions)
+      .status(StatusCode.Success)
+      .json({ message: "login successfull", success: true, user });
+    return;
+  } catch (error) {
+    res
+      .status(StatusCode.Unauthorized)
+      .json({ message: "Unauthorized", success: false });
+    return;
+  }
+};
+export const logout: Handler = async (req, res) => {
+  try {
+    res
+      .clearCookie("accessToken", { path: "/" })
+      .clearCookie("refreshToken", { path: "/" })
+      .json({ message: "logout successfull", success: true })
+      .end();
+  } catch (error) {
+    res
+      .status(StatusCode.ServerError)
+      .json({ message: "Something went wrong from ourside", success: false });
     return;
   }
 };
