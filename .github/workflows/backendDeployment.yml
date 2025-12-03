@@ -22,7 +22,7 @@ jobs:
       - name: 🏗️ Install dependencies and build TypeScript
         run: |
           npm ci
-          npm run build
+          tsc -b
 
       - name: 📦 Prepare deployment package
         run: |
