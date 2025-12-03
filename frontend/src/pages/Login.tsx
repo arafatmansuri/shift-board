@@ -1,8 +1,6 @@
-import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
-// import { useLogin } from "../hooks/useAuth";
 import { Calendar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { setCredentials } from "../store/userSlice";
@@ -50,6 +48,9 @@ export const Login = () => {
               <input
                 type="text"
                 {...register("username", {
+                  required: "Username or email is required",
+                })}
+                {...register("email", {
                   required: "Username or email is required",
                 })}
                 className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
@@ -104,6 +105,29 @@ export const Login = () => {
               Back to home
             </Link>
           </div>
+        </div>
+        <div className="mt-10 bg-white rounded-xl shadow-lg p-8">
+            <h1 className="text-xl font-bold text-slate-800 mb-2">
+              Demo Credentials:
+            </h1>
+          <div><h2 className="text-xl font-semibold text-slate-900 mb-2">Admin:</h2>
+          <div>
+            <p className="block text-sm font-medium text-slate-700 mb-2">
+              username: hire-me@anshumat.org
+            </p>
+            <p className="block text-sm font-medium text-slate-700 mb-2">
+              password: HireMe@2025!
+            </p>
+          </div></div>
+          <div><h2 className="text-xl font-semibold text-slate-900 mb-2">Employee:</h2>
+          <div>
+            <p className="block text-sm font-medium text-slate-700 mb-2">
+              username: employee1
+            </p>
+            <p className="block text-sm font-medium text-slate-700 mb-2">
+              password: User@123
+            </p>
+          </div></div>
         </div>
       </div>
     </div>
