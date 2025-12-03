@@ -7,7 +7,11 @@ import employeeRouter from "./routes/employee";
 import shiftRouter from "./routes/shiftRoutes";
 const app = express();
 
-const allowedOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://shift-board-sigma.vercel.app",
+];
 app.use(express.json());
 app.use(
   cors({
