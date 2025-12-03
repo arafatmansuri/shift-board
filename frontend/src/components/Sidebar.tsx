@@ -11,6 +11,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { useLoginMutation } from "../queries/authQueries";
 import { toggleSidebar } from "../store/sidebarSlice";
 import { logout } from "../store/userSlice";
@@ -21,6 +22,7 @@ export const Sidebar = () => {
   const logoutMutation = useLoginMutation();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const navigate = useNavigate();
+  const isDesktop: boolean = useMediaQuery("(min-width:768px)");
   const isActive = (path: string) => location.pathname === path;
   const dispatch = useAppDispatch();
   const handleLogout = () => {
@@ -38,7 +40,7 @@ export const Sidebar = () => {
   return (
     <div
       className={`w-64 bg-white border-r border-slate-200 md:flex flex-col h-screen ${
-        sidebar ? "flex fixed right-0" : "md:hidden"
+        sidebar && !isDesktop ? "flex fixed right-0" : "hidden"
       }`}
     >
       <div className="p-6 border-b border-slate-200">

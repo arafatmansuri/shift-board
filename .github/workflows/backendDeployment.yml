@@ -1,0 +1,68 @@
+name: Deploy Express shift board to EC2
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - "backend/**" #only run when backend folder changes
+
+jobs:
+  deploy:
+    name: Build and Deploy shift board backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend # ✅ run all commands inside backend folder
+
+    steps:
+      - name: 🧾 Check out repository code
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Install dependencies and build TypeScript
+        run: |
+          npm ci
+          npm run build
+
+      - name: 📦 Prepare deployment package
+        run: |
+          mkdir deploy
+          cp -r dist package.json package-lock.json deploy/
+          cd deploy && tar -czf ../shiftboard.tar.gz .
+
+      - name: 🚀 Upload to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_SSH_KEY }}
+          port: 22
+          source: "backend/shiftboard.tar.gz"
+          target: "~/"
+
+      - name: 🔧 Deploy on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ubuntu
+          key: ${{ secrets.PRIVATE_SSH_KEY }}
+          port: 22
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+            echo "🔄 Deploying shift board backend..."
+            rm -rf ~/shiftboard
+            mkdir ~/shiftboard
+            tar -xzf ~/backend/shiftboard.tar.gz -C ~/shiftboard
+            cd ~/shiftboard
+            echo "🧾 Creating .env file..."
+            echo "${{ secrets.ENV_FILE }}" > .env
+            npm ci --omit=dev
+            deactivate
+
+            echo "🚀 Restarting server with PM2..."
+            pm2 delete sb || true
+            pm2 start dist/server.js --name "sb"
+            pm2 save
