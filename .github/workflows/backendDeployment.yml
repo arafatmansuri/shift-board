@@ -22,6 +22,7 @@ jobs:
       - name: 🏗️ Install dependencies and build TypeScript
         run: |
           npm ci
+          npm install typescript
           tsc -b
 
       - name: 📦 Prepare deployment package
