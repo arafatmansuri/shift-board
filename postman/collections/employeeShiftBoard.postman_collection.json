@@ -1,0 +1,843 @@
+{
+  "info": {
+    "_postman_id": "c40c15ee-6b74-4e29-bd50-4af3f7b1594a",
+    "name": "employeeShiftBoard",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40678762",
+    "_collection_link": "https://techno-sharks.postman.co/workspace/43ff50a9-d4ac-4239-8167-481c441dbbf2/collection/40678762-c40c15ee-6b74-4e29-bd50-4af3f7b1594a?action=share&source=collection_link&creator=40678762"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "login",
+          "id": "505603a2-3216-439d-9ffc-c28e3fad5606",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"employee1\",\r\n    \"password\":\"User@123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "75323698-784c-48f2-bc68-6201a2b3f726",
+              "name": "login",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\":\"employee1\",\r\n    \"password\":\"User@123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/auth/login",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "accessToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDY1ODE1NCwiZXhwIjoxNzY0NjU5MDU0fQ.S-c1LRBDE5W2UDeEJ6Fa6gFMs6-h2wmG5l8Sw0uVnx0; Max-Age=86400; Path=/; Expires=Wed, 03 Dec 2025 06:49:14 GMT; HttpOnly; Secure; SameSite=None"
+                },
+                {
+                  "key": "Set-Cookie",
+                  "value": "refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDY1ODE1NCwiZXhwIjoxNzY0NzQ0NTU0fQ.Lu2WdmLnvtafPMO4pGLeEg3pVKDMyoWmwDxx98L4fMk; Max-Age=86400; Path=/; Expires=Wed, 03 Dec 2025 06:49:14 GMT; HttpOnly; Secure; SameSite=None"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "604"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"25c-MedwB5lhha/wY4RHkRMISlbO1iw\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 02 Dec 2025 06:49:14 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"login successfull\",\n    \"success\": true,\n    \"user\": {\n        \"_id\": \"692e7bfa321861a5e029442f\",\n        \"username\": \"employee1\",\n        \"password\": \"$2b$10$Qr6ELeq8fzkVy7fh9S1v0.5Q1/jeidg728ABVRFb22YKeLCD7VRJS\",\n        \"email\": \"employee1@gmail.com\",\n        \"role\": \"employee\",\n        \"employeeCode\": \"EMP001\",\n        \"department\": \"692e7ad0321861a5e0294428\",\n        \"createdAt\": \"2025-12-02T05:41:14.767Z\",\n        \"updatedAt\": \"2025-12-02T06:49:14.637Z\",\n        \"__v\": 0,\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDY1ODE1NCwiZXhwIjoxNzY0NzQ0NTU0fQ.Lu2WdmLnvtafPMO4pGLeEg3pVKDMyoWmwDxx98L4fMk\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "admin",
+          "id": "3c4a4a18-b6cb-46af-9868-4badf945eea1",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/auth/admin",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "admin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "employee",
+          "id": "e210b187-9ab0-4127-b293-cd7e29954ab3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/auth/employee",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "auth",
+                "employee"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "8d0b2c32-ae22-4f2a-9fcb-7187d5230e54"
+    },
+    {
+      "name": "department",
+      "item": [
+        {
+          "name": "create department",
+          "id": "9c439564-d6bd-411e-b7a9-605b18c3c623",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"692d6dab227e946f7e0eb3aa\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/department/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "department",
+                "create"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "view department",
+          "id": "52a94a28-6473-4900-b014-e2c3b10800b6",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/department/view",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "department",
+                "view"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete department",
+          "id": "269c7082-c176-4838-9813-bee0114e4b76",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/department/delete/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "department",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "692e7a228bd0ad125cfb2239"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "806d96c2-5d37-4d02-bf6a-a5e2a3db123d"
+    },
+    {
+      "name": "shifts",
+      "item": [
+        {
+          "name": "create shift",
+          "id": "bb0c3d80-ca5f-49d8-8910-e8be3f6248b5",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"employeeId\":\"692e7bfa321861a5e029442f\",\r\n    \"date\":\"2025-12-05\",\r\n    \"startTime\":\"15:30\",\r\n    \"endTime\":\"19:30\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/shift/shifts",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "shift",
+                "shifts"
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "bc4294e0-43e2-40db-bdb2-04aab4729782",
+              "name": "create department",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"employeeId\":\"692e7bfa321861a5e029442f\",\r\n    \"date\":\"2025-12-05\",\r\n    \"startTime\":\"09:30\",\r\n    \"endTime\":\"13:30\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/shift/shifts",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "shift",
+                    "shifts"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "218"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"da-hiSsrfLEkeqRYw5sWHfhTJpuzgg\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 04 Dec 2025 10:19:31 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Shift created successfully\",\n    \"success\": true,\n    \"shift\": {\n        \"date\": \"2025-12-05T00:00:00.000Z\",\n        \"startTime\": \"09:30\",\n        \"endTime\": \"13:30\",\n        \"employeeId\": \"692e7bfa321861a5e029442f\",\n        \"_id\": \"69316033e0c4d3e12f09d519\",\n        \"__v\": 0\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "view shifts",
+          "id": "3ff5329d-cd07-4647-a340-338185beaac8",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/shift/shifts?employee=692e7bfa321861a5e029442f&date=2025-12-05",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "shift",
+                "shifts"
+              ],
+              "query": [
+                {
+                  "key": "employee",
+                  "value": "692e7bfa321861a5e029442f"
+                },
+                {
+                  "key": "date",
+                  "value": "2025-12-05"
+                },
+                {
+                  "key": null,
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "559f4185-afd9-46ab-a874-212f18ab4b29",
+              "name": "view shifts",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:3000/api/shift/shifts?employee=692e7bfa321861a5e029442f&date=2025-12-05",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "shift",
+                    "shifts"
+                  ],
+                  "query": [
+                    {
+                      "key": "employee",
+                      "value": "692e7bfa321861a5e029442f"
+                    },
+                    {
+                      "key": "date",
+                      "value": "2025-12-05"
+                    },
+                    {
+                      "key": null,
+                      "value": "",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "1425"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"591-QWKbkR1jYwcnSjU1YgZV27kuIH0\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 04 Dec 2025 10:24:40 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"shifts fetched successfully\",\n    \"success\": true,\n    \"shifts\": [\n        {\n            \"_id\": \"692f185d4a1063c9f5a32c5e\",\n            \"date\": \"2025-12-05T00:00:00.000Z\",\n            \"startTime\": \"18:15\",\n            \"endTime\": \"22:18\",\n            \"employeeId\": {\n                \"_id\": \"692e7bfa321861a5e029442f\",\n                \"username\": \"employee1\",\n                \"password\": \"$2b$10$Qr6ELeq8fzkVy7fh9S1v0.5Q1/jeidg728ABVRFb22YKeLCD7VRJS\",\n                \"email\": \"employee1@gmail.com\",\n                \"role\": \"employee\",\n                \"employeeCode\": \"EMP001\",\n                \"department\": \"692e7ad0321861a5e0294428\",\n                \"createdAt\": \"2025-12-02T05:41:14.767Z\",\n                \"updatedAt\": \"2025-12-03T17:46:54.911Z\",\n                \"__v\": 0,\n                \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDc4NDAxNCwiZXhwIjoxNzY0ODcwNDE0fQ.jn9cWWNA5peKkZzjy8Zw33-EEzbGPzawz8WVvgFkuyo\"\n            },\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69316033e0c4d3e12f09d519\",\n            \"date\": \"2025-12-05T00:00:00.000Z\",\n            \"startTime\": \"09:30\",\n            \"endTime\": \"13:30\",\n            \"employeeId\": {\n                \"_id\": \"692e7bfa321861a5e029442f\",\n                \"username\": \"employee1\",\n                \"password\": \"$2b$10$Qr6ELeq8fzkVy7fh9S1v0.5Q1/jeidg728ABVRFb22YKeLCD7VRJS\",\n                \"email\": \"employee1@gmail.com\",\n                \"role\": \"employee\",\n                \"employeeCode\": \"EMP001\",\n                \"department\": \"692e7ad0321861a5e0294428\",\n                \"createdAt\": \"2025-12-02T05:41:14.767Z\",\n                \"updatedAt\": \"2025-12-03T17:46:54.911Z\",\n                \"__v\": 0,\n                \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDc4NDAxNCwiZXhwIjoxNzY0ODcwNDE0fQ.jn9cWWNA5peKkZzjy8Zw33-EEzbGPzawz8WVvgFkuyo\"\n            },\n            \"__v\": 0\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "employee shift",
+          "id": "479eeafd-ea04-4d47-af30-7d4bde78a07c",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/shift/employeeshift/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "shift",
+                "employeeshift",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "692e7bfa321861a5e029442f"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "delete shift",
+          "id": "d3137864-ecbd-413b-a9f1-7737200289c9",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/shift/delete/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "shift",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "692e8296d123437e13c7f5e9"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "21e0845c-1da6-46d2-a872-cb9e06d7ad43"
+    },
+    {
+      "name": "employee",
+      "item": [
+        {
+          "name": "create employee",
+          "id": "9877423a-99b8-4637-aeb6-e8e1ca90969a",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"employee2\",\r\n    \"email\":\"employee2@gmail.com\",\r\n    \"password\":\"Employee2@123\",\r\n    \"department\":\"692e7ad0321861a5e0294428\",\r\n    \"employeeCode\":\"EMP002\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/employee/create",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "employee",
+                "create"
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "4322324d-9be6-4101-9a80-6121a181a16a",
+              "name": "create employee",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\":\"employee10\",\r\n    \"email\":\"employee10@gmail.com\",\r\n    \"password\":\"Employee10@123\",\r\n    \"department\":\"692e7ad0321861a5e0294428\",\r\n    \"employeeCode\":\"EMP0010\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/employee/create",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "employee",
+                    "create"
+                  ]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "401"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"191-hj8eUVY+U/Z7+qQcBIUQUq7X5HM\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 04 Dec 2025 10:15:25 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Employee created sucessfully\",\n    \"success\": true,\n    \"employee\": {\n        \"username\": \"employee10\",\n        \"password\": \"$2b$10$lUbq4yoV0UWuyQmSFZ.tqeaQ5Dt29/9IE107zhboNtHngS/jLY8qm\",\n        \"email\": \"employee10@gmail.com\",\n        \"role\": \"employee\",\n        \"employeeCode\": \"EMP0010\",\n        \"department\": \"692e7ad0321861a5e0294428\",\n        \"_id\": \"69315f3de0c4d3e12f09d511\",\n        \"createdAt\": \"2025-12-04T10:15:25.608Z\",\n        \"updatedAt\": \"2025-12-04T10:15:25.608Z\",\n        \"__v\": 0\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "view employees",
+          "id": "c19ca144-62cf-4cfb-a3ee-dbfe658dd141",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/employee/view",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "employee",
+                "view"
+              ]
+            }
+          },
+          "response": [
+            {
+              "id": "4b6955c2-a729-4523-8879-4718615e94e2",
+              "name": "view employees",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:3000/api/employee/view",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "3000",
+                  "path": [
+                    "api",
+                    "employee",
+                    "view"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "X-Powered-By",
+                  "value": "Express"
+                },
+                {
+                  "key": "Vary",
+                  "value": "Origin"
+                },
+                {
+                  "key": "Access-Control-Allow-Credentials",
+                  "value": "true"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "5174"
+                },
+                {
+                  "key": "ETag",
+                  "value": "W/\"1436-162xs+fQ5369hC6aI66LnQbLBJU\""
+                },
+                {
+                  "key": "Date",
+                  "value": "Thu, 04 Dec 2025 10:16:14 GMT"
+                },
+                {
+                  "key": "Connection",
+                  "value": "keep-alive"
+                },
+                {
+                  "key": "Keep-Alive",
+                  "value": "timeout=5"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"message\": \"Employee details fetched sucessfully\",\n    \"success\": true,\n    \"employees\": [\n        {\n            \"_id\": \"692e7bfa321861a5e029442f\",\n            \"username\": \"employee1\",\n            \"password\": \"$2b$10$Qr6ELeq8fzkVy7fh9S1v0.5Q1/jeidg728ABVRFb22YKeLCD7VRJS\",\n            \"email\": \"employee1@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP001\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-02T05:41:14.767Z\",\n            \"updatedAt\": \"2025-12-03T17:46:54.911Z\",\n            \"__v\": 0,\n            \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlN2JmYTMyMTg2MWE1ZTAyOTQ0MmYiLCJ1c2VybmFtZSI6ImVtcGxveWVlMSIsImlhdCI6MTc2NDc4NDAxNCwiZXhwIjoxNzY0ODcwNDE0fQ.jn9cWWNA5peKkZzjy8Zw33-EEzbGPzawz8WVvgFkuyo\"\n        },\n        {\n            \"_id\": \"692e7c88321861a5e0294437\",\n            \"username\": \"employee2\",\n            \"password\": \"$2b$10$qeTI6llN45rGI.buo1hj.O22hawUwFIgQP/omhkC9AQLHboiWjbKG\",\n            \"email\": \"employee2@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP002\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-02T05:43:36.673Z\",\n            \"updatedAt\": \"2025-12-02T05:43:36.673Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"692e8e10a85cf6d2d039b425\",\n            \"username\": \"employee3\",\n            \"password\": \"$2b$10$Zim5/xRfbWyR8NTauP4TpObyPrX/FxJ3m0iYqv/nh0HZJuFU0X5Gm\",\n            \"email\": \"employee3@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP003\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-02T06:58:24.775Z\",\n            \"updatedAt\": \"2025-12-03T10:45:43.710Z\",\n            \"__v\": 0,\n            \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJlOGUxMGE4NWNmNmQyZDAzOWI0MjUiLCJ1c2VybmFtZSI6ImVtcGxveWVlMyIsImlhdCI6MTc2NDc1ODc0MywiZXhwIjoxNzY0ODQ1MTQzfQ.wp3TTmcvI7Jmr6UGc1HZy2o4kyIJPvaT2h14v2pMgJY\"\n        },\n        {\n            \"_id\": \"692fb3d071097742915d24b1\",\n            \"username\": \"employee4\",\n            \"password\": \"$2b$10$Xb2Mzcod/JARHYu7/0DISuKynF5FLdUSK9wuj5ah1vGXGoLH9kbr6\",\n            \"email\": \"employee4@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP004\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T03:51:44.246Z\",\n            \"updatedAt\": \"2025-12-03T03:51:44.246Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"692fb42171097742915d24d7\",\n            \"username\": \"employee5\",\n            \"password\": \"$2b$10$fJR8K5D04FmQ5SQLa7BH8OzGXGPC4P7eq8hdBc22/qXJSv/.wIm7W\",\n            \"email\": \"employee5@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP005\",\n            \"department\": {\n                \"_id\": \"692fb3ec71097742915d24c4\",\n                \"departmentName\": \"Sales\",\n                \"departmentCode\": \"DEP002\",\n                \"departmentManager\": \"692e8e10a85cf6d2d039b425\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T03:53:05.226Z\",\n            \"updatedAt\": \"2025-12-03T03:53:05.226Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"692fbcd911d1f675ec4915bf\",\n            \"username\": \"employee6\",\n            \"password\": \"$2b$10$7X2woY9zXLS1wNz1sqeCKezQRDXdyr0P6DX8UPqczGg9qSzlnCYBm\",\n            \"email\": \"employee6@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP006\",\n            \"department\": {\n                \"_id\": \"692fb3ec71097742915d24c4\",\n                \"departmentName\": \"Sales\",\n                \"departmentCode\": \"DEP002\",\n                \"departmentManager\": \"692e8e10a85cf6d2d039b425\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T04:30:17.579Z\",\n            \"updatedAt\": \"2025-12-03T04:30:17.579Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"692fd3016bf288963f0b3616\",\n            \"username\": \"employee7\",\n            \"password\": \"$2b$10$18YsK1U53m2HVG97BLtyR.A6LlWNnJ/vd.dkzkHgu839DsyHmo3.G\",\n            \"email\": \"employee7@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP007\",\n            \"department\": {\n                \"_id\": \"692fb3ec71097742915d24c4\",\n                \"departmentName\": \"Sales\",\n                \"departmentCode\": \"DEP002\",\n                \"departmentManager\": \"692e8e10a85cf6d2d039b425\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T06:04:49.902Z\",\n            \"updatedAt\": \"2025-12-03T10:45:22.721Z\",\n            \"__v\": 0,\n            \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OTJmZDMwMTZiZjI4ODk2M2YwYjM2MTYiLCJ1c2VybmFtZSI6ImVtcGxveWVlNyIsImlhdCI6MTc2NDc1ODcyMiwiZXhwIjoxNzY0ODQ1MTIyfQ.LUVKXU_uY-E907S6XWj7TfV-srLSCP_X2oltNGu8L4Q\"\n        },\n        {\n            \"_id\": \"692fd43e421dd813b4c9ced8\",\n            \"username\": \"employee8\",\n            \"password\": \"$2b$10$uzGObt.QJpU/bhL436JEa.dkfGuzXszeaKbEYbLhz0ewE1HuPBip2\",\n            \"email\": \"employee8@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP008\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T06:10:06.087Z\",\n            \"updatedAt\": \"2025-12-03T06:10:06.087Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"6930143b7bbcaa4e4dadb0c0\",\n            \"username\": \"employee9\",\n            \"password\": \"$2b$10$GuoxMoIF6KAg6/3o3i48p.FjnWEAuf911FQGyXzs233aYmykEjkna\",\n            \"email\": \"employee9@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP009\",\n            \"department\": {\n                \"_id\": \"692fd71d9461c99c9ea5f564\",\n                \"departmentName\": \"Social Media\",\n                \"departmentCode\": \"DEP004\",\n                \"departmentManager\": \"692fd3016bf288963f0b3616\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-03T10:43:07.392Z\",\n            \"updatedAt\": \"2025-12-03T10:43:07.392Z\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"69315f3de0c4d3e12f09d511\",\n            \"username\": \"employee10\",\n            \"password\": \"$2b$10$lUbq4yoV0UWuyQmSFZ.tqeaQ5Dt29/9IE107zhboNtHngS/jLY8qm\",\n            \"email\": \"employee10@gmail.com\",\n            \"role\": \"employee\",\n            \"employeeCode\": \"EMP0010\",\n            \"department\": {\n                \"_id\": \"692e7ad0321861a5e0294428\",\n                \"departmentName\": \"IT\",\n                \"departmentCode\": \"DEP001\",\n                \"departmentManager\": \"692e7bfa321861a5e029442f\",\n                \"__v\": 0\n            },\n            \"createdAt\": \"2025-12-04T10:15:25.608Z\",\n            \"updatedAt\": \"2025-12-04T10:15:25.608Z\",\n            \"__v\": 0\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "delete employee",
+          "id": "6639042e-ab63-40e9-9050-d273ca7aa1eb",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"departmentName\":\"IT\",\r\n    \"departmentCode\":\"DEP001\",\r\n    \"departmentManager\":\"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/employee/delete/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "3000",
+              "path": [
+                "api",
+                "employee",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "692e7a228bd0ad125cfb2239"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "51c02461-0155-4f0a-a842-9243376010ca"
+    }
+  ]
+}

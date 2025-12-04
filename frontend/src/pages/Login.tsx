@@ -43,15 +43,15 @@ export const Login = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Username or Email
+                Email
               </label>
               <input
-                type="text"
-                {...register("username", {
-                  required: "Username or email is required",
-                })}
+                type="email"
+                // {...register("username", {
+                //   required: "Username or email is required",
+                // })}
                 {...register("email", {
-                  required: "Username or email is required",
+                  required: "Email is required",
                 })}
                 className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
                 placeholder="Enter your username or email"
@@ -107,27 +107,35 @@ export const Login = () => {
           </div>
         </div>
         <div className="mt-10 bg-white rounded-xl shadow-lg p-8">
-            <h1 className="text-xl font-bold text-slate-800 mb-2">
-              Demo Credentials:
-            </h1>
-          <div><h2 className="text-xl font-semibold text-slate-900 mb-2">Admin:</h2>
+          <h1 className="text-xl font-bold text-slate-800 mb-2">
+            Demo Credentials:
+          </h1>
           <div>
-            <p className="block text-sm font-medium text-slate-700 mb-2">
-              username: hire-me@anshumat.org
-            </p>
-            <p className="block text-sm font-medium text-slate-700 mb-2">
-              password: HireMe@2025!
-            </p>
-          </div></div>
-          <div><h2 className="text-xl font-semibold text-slate-900 mb-2">Employee:</h2>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+              Admin:
+            </h2>
+            <div>
+              <p className="block text-sm font-medium text-slate-700 mb-2">
+                email: hire-me@anshumat.org
+              </p>
+              <p className="block text-sm font-medium text-slate-700 mb-2">
+                password: HireMe@2025!
+              </p>
+            </div>
+          </div>
           <div>
-            <p className="block text-sm font-medium text-slate-700 mb-2">
-              username: employee1
-            </p>
-            <p className="block text-sm font-medium text-slate-700 mb-2">
-              password: User@123
-            </p>
-          </div></div>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+              Employee:
+            </h2>
+            <div>
+              <p className="block text-sm font-medium text-slate-700 mb-2">
+                email: employee1@gmail.com
+              </p>
+              <p className="block text-sm font-medium text-slate-700 mb-2">
+                password: User@123
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
