@@ -114,7 +114,7 @@ export const Sidebar = () => {
             </div>
             <button
               onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className="p-1 hover:bg-slate-200 rounded"
+              className="p-1 hover:bg-slate-200 rounded cursor-pointer"
             >
               <MoreVertical className="w-5 h-5 text-slate-600" />
             </button>
@@ -124,7 +124,7 @@ export const Sidebar = () => {
             <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-slate-200 rounded-lg shadow-lg py-1">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
                 Logout

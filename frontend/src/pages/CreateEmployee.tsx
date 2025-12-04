@@ -166,7 +166,7 @@ export const CreateEmployee = () => {
           <button
             type="submit"
             disabled={employeeMutation.isPending}
-            className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50"
+            className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {employeeMutation.isPending ? "Adding..." : "Add Employee"}
           </button>
@@ -176,7 +176,7 @@ export const CreateEmployee = () => {
               navigate("/dashboard/employees");
               reset();
             }}
-            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
           >
             Cancel
           </button>
