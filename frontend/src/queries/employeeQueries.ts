@@ -40,12 +40,12 @@ export const useEmployeeQuery = (companyId:string) => {
     retry: false,
   });
 };
-export const useEmployeeMutation = () => {
+export const useEmployeeMutation = <T>() => {
   const queryClient = useQueryClient();
-  return useMutation<User, { message: string; status: number }, UserFormData>({
+  return useMutation<T, { message: string; status: number }, UserFormData>({
     mutationKey: ["employeeMutation"],
-    mutationFn: async ({ endpoint, method, data }: UserFormData) => {
-      return employeeQuery<User>({ endpoint, method, data });
+    mutationFn: async <T>({ endpoint, method, data }: UserFormData) => {
+      return employeeQuery<T>({ endpoint, method, data });
     },
     onSuccess() {
       queryClient.invalidateQueries({ queryKey: ["employeeQuery"] });

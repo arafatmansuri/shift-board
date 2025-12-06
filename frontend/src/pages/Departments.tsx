@@ -1,5 +1,5 @@
 import { Building2, Hash, Menu, Plus, Trash2, User } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
@@ -7,12 +7,19 @@ import {
   useDepartmentMutation,
   useDepartmentQuery,
 } from "../queries/departmentQueries";
+import { useEmployeeMutation } from "../queries/employeeQueries";
 import { getDepartment } from "../store/departmentSlice";
+import { getEmployee } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Department, User as UserType } from "../types";
 
 export const Departments = () => {
   const { user } = useAppSelector((state) => state.user);
+  const [isAssignEnable, setIsAssignEnable] = useState<{
+    isEnable: boolean;
+    id: string;
+    employeeId: string;
+  }>({ isEnable: false, id: "", employeeId: "" });
   const {
     data: departmentsData,
     isLoading,
@@ -26,7 +33,22 @@ export const Departments = () => {
   const { employees } = useAppSelector((state) => state.employees);
   const { departments } = useAppSelector((state) => state.departments);
   const departmentMutation = useDepartmentMutation();
+  const employeeMutation = useEmployeeMutation<UserType[]>();
 
+  useEffect(() => {
+    console.log("entered useef");
+    console.log(departments.length);
+    console.log(employees.length);
+    if (departments.length > 0 && employees.length == 0) {
+      console.log("if");
+      employeeMutation.mutate({
+        endpoint: `view/${
+          typeof user?.company == "object" ? user.company._id : ""
+        }`,
+        method: "GET",
+      });
+    }
+  }, [departments]);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const RefTokenMutation = useLoginMutation();
@@ -50,11 +72,23 @@ export const Departments = () => {
       dispatch(getDepartment(departmentsData));
     }
   }, [isSuccess, departmentsData]);
+  useEffect(() => {
+    if (employeeMutation.isSuccess) {
+      dispatch(getEmployee(employeeMutation.data));
+    }
+  }, [employeeMutation.isSuccess, employeeMutation.data]);
 
   const handleDelete = (id: string) => {
     if (confirm("Are you sure you want to delete this department?")) {
       departmentMutation.mutate({ endpoint: `delete/${id}`, method: "DELETE" });
     }
+  };
+  const assignManager = (id: string, departmentId: string) => {
+    departmentMutation.mutate({
+      endpoint: `assign/${departmentId}`,
+      method: "PUT",
+      data: { departmentManager: id, departmentCode: "", departmentName: "" },
+    });
   };
 
   const getManagerName = (manager: string | UserType | undefined) => {
@@ -107,7 +141,7 @@ export const Departments = () => {
           {departments.map((department: Department) => (
             <div
               key={department._id}
-              className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow"
+              className="bg-white md:p-6 p-4 rounded-xl border border-slate-200 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -121,7 +155,7 @@ export const Departments = () => {
                       </h3>
                     </div>
                   </div>
-                  <div className="space-y-2 text-sm text-slate-600 ml-15">
+                  <div className="space-y-2 text-sm text-slate-600 md:ml-15 w-full">
                     <div className="flex items-center gap-2">
                       <Hash className="w-4 h-4" />
                       <span>Code: {department.departmentCode}</span>
@@ -134,12 +168,92 @@ export const Departments = () => {
                     </div>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(department._id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
+                <div className="flex gap-2">
+                  {isAssignEnable.isEnable &&
+                  isAssignEnable.id == department._id ? (
+                    <div className="md:flex-row flex-col flex gap-2">
+                      <select
+                        name="employees"
+                        className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        title="select manager"
+                        value={isAssignEnable.employeeId}
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setIsAssignEnable({
+                            id: department._id,
+                            employeeId: e.target.value,
+                            isEnable: true,
+                          });
+                        }}
+                      >
+                        {employees
+                          .filter(
+                            (e) =>
+                              typeof e.department == "object" &&
+                              e.department._id == department._id
+                          )
+                          .map((employee) => (
+                            <option value={employee._id} key={employee._id}>
+                              {employee.username} {employee.employeeCode}
+                            </option>
+                          ))}
+                      </select>
+                      <div className="flex gap-2 items-center justify-center">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            assignManager(
+                              isAssignEnable.employeeId,
+                              department._id
+                            );
+                            setIsAssignEnable({
+                              isEnable: false,
+                              id: "",
+                              employeeId: "",
+                            });
+                          }}
+                          className="p-2 px-4 text-black bg-slate-300 hover:bg-slate-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
+                        >
+                          Assign
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setIsAssignEnable({
+                              isEnable: false,
+                              id: "",
+                              employeeId: "",
+                            })
+                          }
+                          className="p-2 px-4 text-black bg-red-400 hover:bg-red-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex">
+                      <button
+                        onClick={() =>
+                          setIsAssignEnable({
+                            isEnable: true,
+                            id: department._id,
+                            employeeId: "",
+                          })
+                        }
+                        className="p-2 md:px-4 text-black bg-slate-200 hover:bg-slate-300 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
+                      >
+                        Assign manager
+                      </button>
+                      <button
+                        onClick={() => handleDelete(department._id)}
+                        className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer`}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))}

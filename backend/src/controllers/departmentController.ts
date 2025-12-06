@@ -1,4 +1,4 @@
-import { isValidObjectId, Types } from "mongoose";
+import { Types } from "mongoose";
 import z from "zod";
 import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
@@ -13,8 +13,7 @@ const departmentSchema = z.object({
 export const createDepartment: Handler = async (req, res) => {
   try {
     const parsedDepartment = departmentSchema.safeParse(req.body);
-    // const companyId = req.params.id as unknown as Types.ObjectId;
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const userEmail = req.email;
     if (!parsedDepartment.success) {
       res.status(StatusCode.InputError).json({
         message: parsedDepartment.error.issues[0].message,
@@ -22,15 +21,9 @@ export const createDepartment: Handler = async (req, res) => {
       });
       return;
     }
-    if (!isValidObjectId(companyId)) {
-      res
-        .status(StatusCode.InputError)
-        .json({ message: "Invalid company id", success: false });
-      return;
-    }
     const { departmentCode, departmentManager, departmentName } =
       parsedDepartment.data;
-    const company = await Company.findById(companyId);
+    const company = await Company.findOne({ companyEmail: userEmail });
     if (!company) {
       res
         .status(StatusCode.NotFound)
@@ -39,7 +32,7 @@ export const createDepartment: Handler = async (req, res) => {
     }
     const departmentData = await Department.findOne({
       $and: [
-        { _id: companyId },
+        { _id: company._id },
         { $or: [{ departmentCode }, { departmentName }] },
       ],
     });
@@ -64,7 +57,7 @@ export const createDepartment: Handler = async (req, res) => {
       departmentCode,
       departmentName,
       departmentManager: manager && manager._id,
-      company: companyId,
+      company: company._id,
     });
     res.status(StatusCode.Created).json({
       message: "Departments created sucessfully",
@@ -90,7 +83,7 @@ export const getAllDepartment: Handler = async (req, res) => {
         .json({ message: "Company not found", success: false });
       return;
     }
-    const departments = await Department.find({company:companyId}).populate(
+    const departments = await Department.find({ company: companyId }).populate(
       "departmentManager",
       "-password -refreshToken"
     );
@@ -128,6 +121,51 @@ export const deleteDepartment: Handler = async (req, res) => {
     res.status(StatusCode.ServerError).json({
       message: "Something went wrong from our side",
       success: false,
+    });
+    return;
+  }
+};
+
+export const assignManager: Handler = async (req, res) => {
+  try {
+    const departmentId = new Types.ObjectId(req.params.id);
+    const employeeId = req.body.departmentManager;
+    if (!departmentId || !employeeId) {
+      res
+        .status(StatusCode.InputError)
+        .json({ message: "departmentId or employeeId required" });
+      return;
+    }
+    const employee = await User.findById(employeeId);
+    if (!employee) {
+      res.status(StatusCode.NotFound).json({ message: "Invalid employeeId" });
+      return;
+    }
+    if (employee.department?.toString() !== departmentId.toString()) {
+      res
+        .status(StatusCode.InputError)
+        .json({ message: "Can't assign manager from deferent department" });
+      return;
+    }
+    const department = await Department.findByIdAndUpdate(
+      departmentId,
+      {
+        $set: {
+          departmentManager: employee._id,
+        },
+      },
+      { new: true }
+    );
+    if (!department) {
+      res.status(StatusCode.NotFound).json({ message: "Invalid department" });
+      return;
+    }
+    res.status(200).json({ message: "manager assigned successfully" });
+  } catch (error) {
+    res.status(StatusCode.ServerError).json({
+      message: "Something went wrong from our side",
+      success: false,
+      error,
     });
     return;
   }

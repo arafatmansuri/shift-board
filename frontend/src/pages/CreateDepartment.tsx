@@ -1,12 +1,11 @@
+import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { useAppDispatch, useAppSelector } from "../hooks";
+import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useDepartmentMutation } from "../queries/departmentQueries";
 import type { CreateDepartmentData } from "../store/departmentSlice";
-import type { User } from "../types";
-import { Menu } from "lucide-react";
 import { toggleSidebar } from "../store/sidebarSlice";
 
 export const CreateDepartment = () => {
@@ -17,7 +16,6 @@ export const CreateDepartment = () => {
     formState: { errors },
   } = useForm<CreateDepartmentData>();
   const navigate = useNavigate();
-  const { employees } = useAppSelector((state) => state.employees);
   const departmentMutation = useDepartmentMutation();
   const RefTokenMutation = useLoginMutation();
   const dispatch = useAppDispatch();

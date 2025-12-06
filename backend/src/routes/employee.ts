@@ -5,7 +5,7 @@ import { createEmployee, deleteEmployee, getAllEmployee } from "../controllers/e
 const employeeRouter = Router();
 
 employeeRouter.use(adminMiddelware);
-employeeRouter.route("/create/:companyId").post(createEmployee);
+employeeRouter.route("/create").post(createEmployee);
 employeeRouter.route("/delete/:id").delete(deleteEmployee);
 employeeRouter.route("/view/:companyId").get(getAllEmployee);
 // employeeRouter.route("/update/:id").put(updateShift);

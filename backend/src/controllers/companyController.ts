@@ -1,3 +1,4 @@
+import { CookieOptions } from "express";
 import z from "zod";
 import { Company } from "../models/companyModel";
 import { User } from "../models/userModel";
@@ -57,12 +58,30 @@ export const createCompany: Handler = async (req, res) => {
       username: `Admin@${companyName}`.replace(" ", ""),
       company: newCompany._id,
     });
-    res.status(StatusCode.Created).json({
-      message: "Company created successfully",
-      company: newCompany,
-      user: newUser,
-      success: true,
-    });
+    const { accessToken, refreshToken } =
+      newUser.generateAccessAndRefreshToken();
+    const user = await User.findByIdAndUpdate(newUser._id, {
+      $set: { refreshToken },
+    })
+      .select("-password -refreshToken")
+      .populate("company", "-companyPassword");
+    const cookieOptions: CookieOptions = {
+      sameSite: "none",
+      secure: true,
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    };
+    res
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .status(StatusCode.Created)
+      .json({
+        message: "Company created successfully",
+        company: newCompany,
+        user,
+        success: true,
+      });
     return;
   } catch (error) {
     res.status(StatusCode.ServerError).json({

@@ -66,6 +66,7 @@ export const adminMiddelware: MHandler = async (req, res, next) => {
       return;
     }
     req._id = user._id;
+    req.email = user.email;
     req.role = user.role;
     next();
   } catch (error) {

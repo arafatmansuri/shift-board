@@ -28,7 +28,7 @@ const employeeSchema = z.object({
 export const createEmployee: Handler = async (req, res) => {
   try {
     const parsedEmployee = employeeSchema.safeParse(req.body);
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const userEmail = req.email;
     if (!parsedEmployee.success) {
       res.status(StatusCode.InputError).json({
         message: parsedEmployee.error.issues[0].message,
@@ -36,14 +36,8 @@ export const createEmployee: Handler = async (req, res) => {
       });
       return;
     }
-    if (!isValidObjectId(companyId)) {
-      res
-        .status(StatusCode.InputError)
-        .json({ message: "Invalid company id", success: false });
-      return;
-    }
     const { email, employeeCode, password, username } = parsedEmployee.data;
-    const company = await Company.findById(companyId);
+    const company = await Company.findOne({companyEmail:userEmail});
     if (!company) {
       res
         .status(StatusCode.NotFound)
@@ -52,7 +46,7 @@ export const createEmployee: Handler = async (req, res) => {
     }
     const employeeData = await User.findOne({
       $and: [
-        { _id: companyId },
+        { _id: company._id },
         { $or: [{ email }, { employeeCode }, { username }] },
       ],
     });
@@ -78,7 +72,7 @@ export const createEmployee: Handler = async (req, res) => {
       password,
       role: "employee",
       username,
-      company: companyId,
+      company: company._id,
     });
     res.status(StatusCode.Created).json({
       message: "Employee created sucessfully",

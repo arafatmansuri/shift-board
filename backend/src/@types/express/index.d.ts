@@ -6,6 +6,7 @@ declare global {
     interface Request {
       _id?: Types.ObjectId;
       role?: string;
+      email?:string;
     }
   }
 }

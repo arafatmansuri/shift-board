@@ -63,10 +63,11 @@ export const login: Handler = async (req, res) => {
       .status(StatusCode.Success)
       .json({ message: "login successfull", success: true, user });
     return;
-  } catch (error: any) {
+  } catch (error) {
     res.status(StatusCode.ServerError).json({
-      message: error.message || "Something went wrong from our side",
+      message:"Something went wrong from our side",
       success: false,
+      error
     });
     return;
   }

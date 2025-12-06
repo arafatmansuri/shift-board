@@ -18,7 +18,7 @@ const shiftSchema = z.object({
 export const createShift: Handler = async (req, res) => {
   try {
     const shiftParse = shiftSchema.safeParse(req.body);
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const userEmail = req.email;
     if (!shiftParse.success) {
       res.status(StatusCode.InputError).json({
         message: shiftParse.error.issues[0].message || "Invalid shift data",
@@ -27,7 +27,7 @@ export const createShift: Handler = async (req, res) => {
       return;
     }
     const { date, employeeId, endTime, startTime } = shiftParse.data;
-    const company = await Company.findById(companyId);
+    const company = await Company.findOne({ companyEmail: userEmail });
     if (!company) {
       res
         .status(StatusCode.NotFound)

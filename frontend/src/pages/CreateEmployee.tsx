@@ -1,13 +1,16 @@
+import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useEmployeeMutation } from "../queries/employeeQueries";
-import type { CreateEmployeeData } from "../store/employeeSlice";
-import type { Department } from "../types";
+import {
+  createEmployee,
+  type CreateEmployeeData,
+} from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
-import { Menu } from "lucide-react";
+import type { Department, User } from "../types";
 
 export const CreateEmployee = () => {
   const {
@@ -18,7 +21,7 @@ export const CreateEmployee = () => {
   } = useForm<CreateEmployeeData>();
   const navigate = useNavigate();
   const { departments } = useAppSelector((state) => state.departments);
-  const employeeMutation = useEmployeeMutation();
+  const employeeMutation = useEmployeeMutation<User>();
   const RefTokenMutation = useLoginMutation();
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -33,6 +36,11 @@ export const CreateEmployee = () => {
       );
     }
   }, [employeeMutation.isError, employeeMutation.error]);
+  useEffect(() => {
+    if (employeeMutation.isSuccess) {
+      dispatch(createEmployee(employeeMutation.data));
+    }
+  }, [employeeMutation.isSuccess]);
   const onSubmit = (data: CreateEmployeeData) => {
     employeeMutation.mutate(
       { endpoint: "create", method: "POST", data },
@@ -40,9 +48,10 @@ export const CreateEmployee = () => {
         onSuccess: () => {
           reset();
         },
-      }
-    );
+      },
+    )
   };
+
   return (
     <div className="p-8">
       <div className="flex justify-between">
