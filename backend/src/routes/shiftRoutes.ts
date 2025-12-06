@@ -15,9 +15,9 @@ const shiftRouter = Router();
 
 shiftRouter.route("/employeeshift").get(employeeMiddelware, getEmployeeShifts);
 shiftRouter.use(adminMiddelware);
-shiftRouter.route("/shifts").post(createShift);
+shiftRouter.route("/shifts/:companyId").post(createShift);
 shiftRouter.route("/delete/:id").delete(deleteShift);
-shiftRouter.route("/shifts").get(getAllShifts);
+shiftRouter.route("/shifts/:companyId").get(getAllShifts);
 shiftRouter.route("/update/:id").put(updateShift);
 
 export default shiftRouter

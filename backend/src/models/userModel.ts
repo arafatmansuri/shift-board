@@ -3,12 +3,13 @@ import jwt from "jsonwebtoken";
 import { model, Schema } from "mongoose";
 const UserSchema = new Schema(
   {
-    username: { type: String, required: true, unique: true },
+    username: { type: String, required: true },
     password: { type: String },
     email: { type: String, required: true, unique: true },
     role: { type: String, enum: ["employee", "admin"], default: "employee" },
-    employeeCode: { type: String, unique: true },
+    employeeCode: { type: String },
     department: { type: Schema.Types.ObjectId, ref: "Department" },
+    company: { type: Schema.Types.ObjectId, ref: "Company" },
     refreshToken: { type: String },
   },
   {

@@ -1,9 +1,11 @@
 import { CookieOptions } from "express";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
+import { Company } from "../models/companyModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
 const loginSchema = z.object({
+  companyName: z.string({ error: "company name must be string" }).trim(),
   username: z.string({ error: "Username must be string" }).trim().optional(),
   email: z.email({ error: "Invalid email address" }).optional(),
   password: z.string({ error: "Password must be string" }),
@@ -19,8 +21,17 @@ export const login: Handler = async (req, res) => {
       });
       return;
     }
-    const { password, email, username } = loginParse.data;
-    const user = await User.findOne({ $or: [{ email }, { username }] });
+    const { password, email, username, companyName } = loginParse.data;
+    const company = await Company.findOne({ companyName });
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
+    const user = await User.findOne({ $or: [{ email }, { username }] })
+      .select("-refreshToken")
+      .populate("company", "-companyPassword");
     if (!user) {
       res
         .status(StatusCode.NotFound)
@@ -63,7 +74,10 @@ export const login: Handler = async (req, res) => {
 export const me: Handler = async (req, res) => {
   try {
     const _id = req._id;
-    const user = await User.findById(_id).populate("department");
+    const user = await User.findById(_id)
+      .select("-password -refreshToken")
+      .populate("company", "-companyPassword")
+      .populate("department");
     if (!user) {
       res
         .status(StatusCode.NotFound)
@@ -101,7 +115,9 @@ export const refreshAccessToken: Handler = async (req, res) => {
       return;
     }
     //@ts-ignore
-    const user = await User.findById(decodedRefreshToken._id);
+    const user = await User.findById(decodedRefreshToken._id)
+      .select("-password -refreshToken")
+      .populate("company", "-companyPassword");
     if (!user) {
       res
         .status(StatusCode.Unauthorized)

@@ -1,4 +1,6 @@
+import { isValidObjectId, Types } from "mongoose";
 import z from "zod";
+import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
@@ -26,6 +28,7 @@ const employeeSchema = z.object({
 export const createEmployee: Handler = async (req, res) => {
   try {
     const parsedEmployee = employeeSchema.safeParse(req.body);
+    const companyId = new Types.ObjectId(req.params.companyId);
     if (!parsedEmployee.success) {
       res.status(StatusCode.InputError).json({
         message: parsedEmployee.error.issues[0].message,
@@ -33,9 +36,25 @@ export const createEmployee: Handler = async (req, res) => {
       });
       return;
     }
+    if (!isValidObjectId(companyId)) {
+      res
+        .status(StatusCode.InputError)
+        .json({ message: "Invalid company id", success: false });
+      return;
+    }
     const { email, employeeCode, password, username } = parsedEmployee.data;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
     const employeeData = await User.findOne({
-      $or: [{ email }, { employeeCode }, { username }],
+      $and: [
+        { _id: companyId },
+        { $or: [{ email }, { employeeCode }, { username }] },
+      ],
     });
     if (employeeData) {
       res
@@ -59,6 +78,7 @@ export const createEmployee: Handler = async (req, res) => {
       password,
       role: "employee",
       username,
+      company: companyId,
     });
     res.status(StatusCode.Created).json({
       message: "Employee created sucessfully",
@@ -76,9 +96,18 @@ export const createEmployee: Handler = async (req, res) => {
 };
 export const getAllEmployee: Handler = async (req, res) => {
   try {
-    const employees = await User.find({ role: "employee" }).populate(
-      "department"
-    );
+    const companyId = new Types.ObjectId(req.params.companyId);
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
+    const employees = await User.find({
+      role: "employee",
+      company: companyId,
+    }).populate("department");
     res.status(StatusCode.Success).json({
       message: "Employee details fetched sucessfully",
       success: true,

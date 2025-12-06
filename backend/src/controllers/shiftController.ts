@@ -1,4 +1,6 @@
+import { Types } from "mongoose";
 import z from "zod";
+import { Company } from "../models/companyModel";
 import { Shift } from "../models/shiftModel";
 import { User } from "../models/userModel";
 import {
@@ -16,6 +18,7 @@ const shiftSchema = z.object({
 export const createShift: Handler = async (req, res) => {
   try {
     const shiftParse = shiftSchema.safeParse(req.body);
+    const companyId = new Types.ObjectId(req.params.companyId);
     if (!shiftParse.success) {
       res.status(StatusCode.InputError).json({
         message: shiftParse.error.issues[0].message || "Invalid shift data",
@@ -24,6 +27,13 @@ export const createShift: Handler = async (req, res) => {
       return;
     }
     const { date, employeeId, endTime, startTime } = shiftParse.data;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
     const employee = await User.findById(employeeId);
     if (!employee) {
       res
@@ -74,6 +84,7 @@ export const createShift: Handler = async (req, res) => {
       startTime,
       endTime,
       employeeId: employee._id,
+      company: company._id,
     });
     res.status(StatusCode.Created).json({
       message: "Shift created successfully",
@@ -199,13 +210,26 @@ export const updateShift: Handler = async (req, res) => {
 export const getAllShifts: Handler = async (req, res) => {
   try {
     const { employee, date } = req.query;
-    let shifts = await Shift.find().populate("employeeId");
+    const companyId = new Types.ObjectId(req.params.companyId);
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
+    let shifts = await Shift.find({ company: company._id }).populate(
+      "employeeId"
+    );
     if (employee && !date) {
-      shifts = await Shift.find({ employeeId: employee }).populate(
-        "employeeId"
-      );
+      shifts = await Shift.find({
+        employeeId: employee,
+        company: company._id,
+      }).populate("employeeId");
     } else if (!employee && date) {
-      shifts = (await Shift.find().populate("employeeId")).filter((s) => {
+      shifts = (
+        await Shift.find({ company: company._id }).populate("employeeId")
+      ).filter((s) => {
         const existingshiftDate = new Date(s.date);
         const currentDate = new Date(date as string);
         if (existingshiftDate.getDate() == currentDate.getDate()) {
@@ -215,7 +239,10 @@ export const getAllShifts: Handler = async (req, res) => {
       });
     } else if (employee && date) {
       shifts = (
-        await Shift.find({ employeeId: employee }).populate("employeeId")
+        await Shift.find({
+          employeeId: employee,
+          company: company._id,
+        }).populate("employeeId")
       ).filter((s) => {
         const existingshiftDate = new Date(s.date);
         const currentDate = new Date(date as string);

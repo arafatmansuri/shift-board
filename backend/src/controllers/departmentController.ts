@@ -1,28 +1,47 @@
+import { isValidObjectId, Types } from "mongoose";
 import z from "zod";
+import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
+
 const departmentSchema = z.object({
   departmentName: z.string().min(2, { error: "Department name is too short" }),
   departmentCode: z.string(),
-  departmentManager: z.string(),
+  departmentManager: z.string().optional(),
 });
 export const createDepartment: Handler = async (req, res) => {
   try {
     const parsedDepartment = departmentSchema.safeParse(req.body);
+    // const companyId = req.params.id as unknown as Types.ObjectId;
+    const companyId = new Types.ObjectId(req.params.companyId);
     if (!parsedDepartment.success) {
+      res.status(StatusCode.InputError).json({
+        message: parsedDepartment.error.issues[0].message,
+        success: false,
+      });
+      return;
+    }
+    if (!isValidObjectId(companyId)) {
       res
         .status(StatusCode.InputError)
-        .json({
-          message: parsedDepartment.error.issues[0].message,
-          success: false,
-        });
+        .json({ message: "Invalid company id", success: false });
       return;
     }
     const { departmentCode, departmentManager, departmentName } =
       parsedDepartment.data;
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
     const departmentData = await Department.findOne({
-      $or: [{ departmentCode }, { departmentName }],
+      $and: [
+        { _id: companyId },
+        { $or: [{ departmentCode }, { departmentName }] },
+      ],
     });
     if (departmentData) {
       res
@@ -30,18 +49,22 @@ export const createDepartment: Handler = async (req, res) => {
         .json({ message: "Department already exists", success: false });
       return;
     }
-    const manager = await User.findById(departmentManager);
-    if (!manager) {
-      res.status(StatusCode.NotFound).json({
-        message: "department manager not found",
-        success: false,
-      });
-      return;
+    let manager;
+    if (departmentManager) {
+      manager = await User.findById(departmentManager);
+      if (!manager) {
+        res.status(StatusCode.NotFound).json({
+          message: "department manager not found",
+          success: false,
+        });
+        return;
+      }
     }
     const department = await Department.create({
       departmentCode,
       departmentName,
-      departmentManager: manager._id,
+      departmentManager: manager && manager._id,
+      company: companyId,
     });
     res.status(StatusCode.Created).json({
       message: "Departments created sucessfully",
@@ -59,14 +82,23 @@ export const createDepartment: Handler = async (req, res) => {
 };
 export const getAllDepartment: Handler = async (req, res) => {
   try {
-    const departments = await Department.find().populate("departmentManager");
-    res
-      .status(StatusCode.Success)
-      .json({
-        message: "Departments fetched sucessfully",
-        success: true,
-        departments,
-      });
+    const companyId = new Types.ObjectId(req.params.companyId);
+    const company = await Company.findById(companyId);
+    if (!company) {
+      res
+        .status(StatusCode.NotFound)
+        .json({ message: "Company not found", success: false });
+      return;
+    }
+    const departments = await Department.find({company:companyId}).populate(
+      "departmentManager",
+      "-password -refreshToken"
+    );
+    res.status(StatusCode.Success).json({
+      message: "Departments fetched sucessfully",
+      success: true,
+      departments,
+    });
     return;
   } catch (error) {
     res.status(StatusCode.ServerError).json({

@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import authRouter from "./routes/authRoutes";
+import companyRouter from "./routes/companyRoutes";
 import departmentRouter from "./routes/departmentRoutes";
 import employeeRouter from "./routes/employee";
 import shiftRouter from "./routes/shiftRoutes";
@@ -35,5 +36,6 @@ app.use("/api/auth", authRouter);
 app.use("/api/shift", shiftRouter);
 app.use("/api/employee", employeeRouter);
 app.use("/api/department", departmentRouter);
+app.use("/api/company", companyRouter);
 
 export default app;
