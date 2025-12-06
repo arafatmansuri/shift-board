@@ -95,7 +95,7 @@ export const CreateDepartment = () => {
           )}
         </div>
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
             Department Manager
           </label>
@@ -117,7 +117,7 @@ export const CreateDepartment = () => {
               {errors.departmentManager.message}
             </p>
           )}
-        </div>
+        </div> */}
         {departmentMutation.isError && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm text-red-600">

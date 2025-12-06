@@ -8,10 +8,11 @@ import {
   useDepartmentQuery,
 } from "../queries/departmentQueries";
 import { getDepartment } from "../store/departmentSlice";
-import type { Department, User as UserType } from "../types";
 import { toggleSidebar } from "../store/sidebarSlice";
+import type { Department, User as UserType } from "../types";
 
 export const Departments = () => {
+  const { user } = useAppSelector((state) => state.user);
   const {
     data: departmentsData,
     isLoading,
@@ -19,7 +20,9 @@ export const Departments = () => {
     isError,
     error,
     refetch,
-  } = useDepartmentQuery();
+  } = useDepartmentQuery(
+    typeof user?.company == "object" ? user.company._id : ""
+  );
   const { employees } = useAppSelector((state) => state.employees);
   const { departments } = useAppSelector((state) => state.departments);
   const departmentMutation = useDepartmentMutation();

@@ -24,7 +24,9 @@ export const Shifts = () => {
   const { employees } = useAppSelector((state) => state.employees);
   const [endpoint, setEndpoint] = useState(
     user?.role === "admin"
-      ? `shifts?employee=${filterEmployee}&date=${filterDate}`
+      ? `shifts/${
+          typeof user?.company == "object" ? user.company._id : ""
+        }?employee=${filterEmployee}&date=${filterDate}`
       : "employeeshift"
   );
   const dispatch = useAppDispatch();
@@ -59,7 +61,7 @@ export const Shifts = () => {
     }
   }, [shiftError, error]);
   const { data: employeesData, isSuccess: employeeSuccessStatus } =
-    useEmployeeQuery();
+    useEmployeeQuery(typeof user?.company == "object" ? user.company._id : "");
   useEffect(() => {
     if (employeeSuccessStatus) {
       dispatch(getEmployee(employeesData));
@@ -134,7 +136,9 @@ export const Shifts = () => {
               onChange={(e) => {
                 setFilterDate(e.target.value);
                 setEndpoint(
-                  `shifts?employee=${filterEmployee}&date=${e.target.value}`
+                  `shifts/${
+                    typeof user?.company == "object" ? user.company._id : ""
+                  }?employee=${filterEmployee}&date=${e.target.value}`
                 );
                 // refetchShifts();
               }}
@@ -146,7 +150,9 @@ export const Shifts = () => {
               onChange={(e) => {
                 setFilterEmployee(e.target.value);
                 setEndpoint(
-                  `shifts?employee=${e.target.value}&date=${filterDate}`
+                  `shifts/${
+                    typeof user?.company == "object" ? user.company._id : ""
+                  }?employee=${e.target.value}&date=${filterDate}`
                 );
               }}
               className="md:px-4 md:py-2 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 mb-2 md:mb-0"
@@ -163,7 +169,11 @@ export const Shifts = () => {
                 onClick={() => {
                   setFilterDate("");
                   setFilterEmployee("");
-                  setEndpoint(`shifts`);
+                  setEndpoint(
+                    `shifts/${
+                      typeof user?.company == "object" ? user.company._id : ""
+                    }`
+                  );
                 }}
                 className="px-4 py-2 text-slate-600 hover:text-slate-900 cursor-pointer"
               >

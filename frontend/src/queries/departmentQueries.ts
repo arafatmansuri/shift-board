@@ -25,17 +25,18 @@ export const departmentQuery = async <T>({
     };
   }
 };
-export const useDepartmentQuery = () => {
+export const useDepartmentQuery = (companyId:string) => {
   return useQuery<
     Department[],
     { message: string; status: number },
     Department[],
     string[]
   >({
-    queryKey: ["departmentQuery"],
-    queryFn: async () => {
+    queryKey: ["departmentQuery",companyId],
+    queryFn: async ({queryKey}) => {
+      const companyId = queryKey[1] as string;
       return await departmentQuery<Department[]>({
-        endpoint: "view",
+        endpoint: `view/${companyId}`,
         method: "GET",
       });
     },

@@ -1,5 +1,5 @@
+import { Building2, Calendar, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Calendar, Users, Building2 } from "lucide-react";
 
 const App = () => {
   return (
@@ -13,12 +13,21 @@ const App = () => {
                 ShiftBoard
               </span>
             </div>
-            <Link
-              to="/login"
-              className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
-            >
-              Login
-            </Link>
+            <div className="flex gap-4">
+              <Link
+                to="/register"
+                className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
+              >
+                Register your company
+              </Link>
+              <Link
+                to="/login"
+                className="px-6 py-2 border border-slate-300 bg-slate-200 text-slate-900 font-medium rounded-lg hover:bg-slate-300 transition-colors cursor-pointer"
+                // className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium"
+              >
+                Login
+              </Link>
+            </div>
           </div>
         </div>
       </nav>
@@ -33,13 +42,20 @@ const App = () => {
             system. Perfect for managing employees, departments, and schedules
             all in one place.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex gap-5 justify-center">
             <Link
-              to="/login"
+              to="/register"
               className="inline-block px-8 py-3 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+              // className="inline-block px-8 py-3 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
             >
               Get Started
             </Link>
+            {/* <Link
+              to="/login"
+              className="inline-block px-8 py-3 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+            >
+              Login to your account
+            </Link> */}
           </div>
         </div>
 
@@ -87,4 +103,4 @@ const App = () => {
     </div>
   );
 };
-export default App
+export default App;

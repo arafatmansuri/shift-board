@@ -12,6 +12,7 @@ import { type Department, type User } from "../types";
 import { toggleSidebar } from "../store/sidebarSlice";
 
 export const Employees = () => {
+  const { user } = useAppSelector((state) => state.user);
   const {
     data: employeesData,
     isLoading,
@@ -19,7 +20,9 @@ export const Employees = () => {
     isError,
     error,
     refetch,
-  } = useEmployeeQuery();
+  } = useEmployeeQuery(
+    typeof user?.company == "object" ? user.company._id : ""
+  );
   const employeeMutation = useEmployeeMutation();
   const { employees } = useAppSelector((state) => state.employees);
   const { departments } = useAppSelector((state) => state.departments);

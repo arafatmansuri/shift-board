@@ -25,16 +25,17 @@ export const employeeQuery = async <T>({
     };
   }
 };
-export const useEmployeeQuery = () => {
+export const useEmployeeQuery = (companyId:string) => {
   return useQuery<
     User[],
     { message: string; status: number },
     User[],
     string[]
   >({
-    queryKey: ["employeeQuery"],
-    queryFn: async () => {
-      return await employeeQuery<User[]>({ endpoint: "view", method: "GET" });
+    queryKey: ["employeeQuery",companyId],
+    queryFn: async ({queryKey}) => {
+      const companyId = queryKey[1] as string;
+      return await employeeQuery<User[]>({ endpoint: `view/${companyId}`, method: "GET" });
     },
     retry: false,
   });

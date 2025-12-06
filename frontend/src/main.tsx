@@ -15,6 +15,7 @@ import { Login } from "./pages/Login.tsx";
 import { Shifts } from "./pages/Shifts.tsx";
 import { store } from "./store/index.ts";
 import { CreateDepartment } from "./pages/CreateDepartment.tsx";
+import { Signup } from "./pages/Singup.tsx";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -24,6 +25,7 @@ createRoot(document.getElementById("root")!).render(
           <Routes>
             <Route path="/" element={<App />} index={true} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Signup />} />
             <Route
               path="/dashboard"
               element={

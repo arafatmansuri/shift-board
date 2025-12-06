@@ -27,7 +27,7 @@ export const userSlice = createSlice({
     },
     setCredentials: (
       state,
-      action: PayloadAction<{ user: User; isAuthorized: boolean }>
+      action: PayloadAction<{ user: User | null; isAuthorized: boolean }>
     ) => {
       state.user = action.payload.user;
       state.isAuthenticated = action.payload.isAuthorized;

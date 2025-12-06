@@ -3,6 +3,7 @@ import {
   Calendar,
   LogOut,
   MoreVertical,
+  Settings,
   User,
   Users,
   X,
@@ -47,7 +48,9 @@ export const Sidebar = () => {
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Calendar className="w-8 h-8 text-slate-700" />
-            <h1 className="text-xl font-bold text-slate-900">ShiftBoard</h1>
+            <h1 className="text-xl font-bold text-slate-900">
+              {typeof user?.company == "object" && user.company.companyName}
+            </h1>
           </div>
           <X
             className="mt-1 md:hidden"
@@ -128,6 +131,13 @@ export const Sidebar = () => {
               >
                 <LogOut className="w-4 h-4" />
                 Logout
+              </button>
+              <button
+                // onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 cursor-pointer"
+              >
+                <Settings className="w-4 h-4" />
+                settings
               </button>
             </div>
           )}
