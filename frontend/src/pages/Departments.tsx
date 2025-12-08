@@ -12,14 +12,14 @@ import { getDepartment } from "../store/departmentSlice";
 import { getEmployee } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Department, User as UserType } from "../types";
-
 export const Departments = () => {
   const { user } = useAppSelector((state) => state.user);
   const [isAssignEnable, setIsAssignEnable] = useState<{
     isEnable: boolean;
     id: string;
     employeeId: string;
-  }>({ isEnable: false, id: "", employeeId: "" });
+    employees?: boolean;
+  }>({ isEnable: false, id: "", employeeId: "", employees: true });
   const {
     data: departmentsData,
     isLoading,
@@ -36,11 +36,7 @@ export const Departments = () => {
   const employeeMutation = useEmployeeMutation<UserType[]>();
 
   useEffect(() => {
-    console.log("entered useef");
-    console.log(departments.length);
-    console.log(employees.length);
-    if (departments.length > 0 && employees.length == 0) {
-      console.log("if");
+    if (departments.length > 0) {
       employeeMutation.mutate({
         endpoint: `view/${
           typeof user?.company == "object" ? user.company._id : ""
@@ -168,8 +164,15 @@ export const Departments = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 items-center">
+                  {!isAssignEnable.employees &&
+                    isAssignEnable.id == department._id && (
+                      <div className="text-red-500">
+                        No employees in the department
+                      </div>
+                    )}
                   {isAssignEnable.isEnable &&
+                  isAssignEnable.employees &&
                   isAssignEnable.id == department._id ? (
                     <div className="md:flex-row flex-col flex gap-2">
                       <select
@@ -178,7 +181,6 @@ export const Departments = () => {
                         title="select manager"
                         value={isAssignEnable.employeeId}
                         onChange={(e) => {
-                          console.log(e.target.value);
                           setIsAssignEnable({
                             id: department._id,
                             employeeId: e.target.value,
@@ -234,13 +236,19 @@ export const Departments = () => {
                   ) : (
                     <div className="flex">
                       <button
-                        onClick={() =>
+                        onClick={() => {
+                          const emp = employees.filter(
+                            (e) =>
+                              typeof e.department == "object" &&
+                              e.department._id == department._id
+                          );
                           setIsAssignEnable({
                             isEnable: true,
                             id: department._id,
-                            employeeId: "",
-                          })
-                        }
+                            employeeId: emp.length > 0 ? emp[0]._id : "",
+                            employees: emp.length > 0 ? true : false,
+                          });
+                        }}
                         className="p-2 md:px-4 text-black bg-slate-200 hover:bg-slate-300 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
                       >
                         Assign manager

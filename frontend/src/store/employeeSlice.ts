@@ -8,6 +8,7 @@ export interface CreateEmployeeData {
   password: string;
   employeeCode: string;
   department: string;
+  companyName:string;
 }
 
 type EmployeeState = {

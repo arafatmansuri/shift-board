@@ -43,6 +43,7 @@ export const login: Handler = async (req, res) => {
       res
         .status(StatusCode.NotFound)
         .json({ message: "Incorrect password", success: false });
+      return;
     }
     const { accessToken, refreshToken } = user.generateAccessAndRefreshToken();
     await User.findByIdAndUpdate(user._id, {
@@ -65,9 +66,9 @@ export const login: Handler = async (req, res) => {
     return;
   } catch (error) {
     res.status(StatusCode.ServerError).json({
-      message:"Something went wrong from our side",
+      message: "Something went wrong from our side",
       success: false,
-      error
+      error,
     });
     return;
   }
