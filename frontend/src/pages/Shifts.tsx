@@ -15,6 +15,7 @@ import { getEmployee } from "../store/employeeSlice";
 import { getShifts, removeShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Shift, User } from "../types";
+import { Button } from "../components/Button";
 
 export const Shifts = () => {
   const [filterDate, setFilterDate] = useState("");
@@ -120,14 +121,19 @@ export const Shifts = () => {
 
       {user?.role === "admin" && (
         <div className="mb-6 flex flex-wrap gap-4">
-          <button
+          {/* <button
             onClick={() => navigate("/dashboard/shifts/create")}
             className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             Create Shift
-          </button>
-
+          </button> */}
+          <Button
+            text="Create Shift"
+            varient="primary"
+            startIcon={<Plus className="w-4 h-4" />}
+            onClick={() => navigate("/dashboard/shifts/create")}
+          />
           <div className="flex-col md:flex-row items-center gap-2">
             <Filter className="w-5 h-5 text-slate-600 hidden md:inline md:mr-2" />
             <input

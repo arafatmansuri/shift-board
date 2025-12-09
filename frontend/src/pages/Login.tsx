@@ -1,6 +1,9 @@
 import { Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../components/Button";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
 import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { setCredentials } from "../store/userSlice";
@@ -41,81 +44,53 @@ export const Login = () => {
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Company name
-              </label>
-              <input
-                type="text"
-                // {...register("username", {
-                //   required: "Username or email is required",
-                // })}
-                {...register("companyName", {
+            <Input
+              isError={errors["companyName"] ? true : false}
+              label={"Company name"}
+              placeholder={"Enter your company name"}
+              errorMessage={errors.companyName && errors.companyName.message}
+              formHook={{
+                ...register("companyName", {
                   required: "Company name is required",
-                })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your company name"
-              />
-              {errors.companyName && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.companyName.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                // {...register("username", {
-                //   required: "Username or email is required",
-                // })}
-                {...register("email", {
+                }),
+              }}
+            />
+            <Input
+              isError={errors["email"] ? true : false}
+              label={"Email"}
+              placeholder={"Enter your email"}
+              errorMessage={errors.email && errors.email.message}
+              formHook={{
+                ...register("email", {
                   required: "Email is required",
-                })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your username or email"
-              />
-              {errors.username && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                {...register("password", { required: "Password is required" })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your password"
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
-                </p>
-              )}
-            </div>
+                }),
+              }}
+              type={"email"}
+            />
+            <Input
+              isError={errors["password"] ? true : false}
+              label={"Password"}
+              placeholder={"Enter your password"}
+              errorMessage={errors.password && errors.password.message}
+              formHook={{
+                ...register("password", {
+                  required: "Password is required",
+                }),
+              }}
+              type="password"
+            />
 
             {loginMutation.isError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">
-                  {loginMutation.error.message}
-                </p>
-              </div>
+              <Box type="error" message={loginMutation.error.message} />
             )}
 
-            <button
+            <Button
+              isDisabled={loginMutation.isPending}
               type="submit"
-              disabled={loginMutation.isPending}
-              className="w-full py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
-            >
-              {loginMutation.isPending ? "Logingin..." : "Login"}
-            </button>
+              text={loginMutation.isPending ? "Logingin..." : "Login"}
+              varient="primary"
+              isWidthFull={true}
+            />
           </form>
 
           <div className="mt-6 text-center">

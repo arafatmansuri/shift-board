@@ -1,6 +1,14 @@
-import { Hash, Mail, Menu, Plus, Trash2, Users as UsersIcon } from "lucide-react";
+import {
+  Hash,
+  Mail,
+  Menu,
+  Plus,
+  Trash2,
+  Users as UsersIcon,
+} from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { Button } from "../components/Button";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import {
@@ -8,8 +16,8 @@ import {
   useEmployeeQuery,
 } from "../queries/employeeQueries";
 import { getEmployee } from "../store/employeeSlice";
-import { type Department, type User } from "../types";
 import { toggleSidebar } from "../store/sidebarSlice";
+import { type Department, type User } from "../types";
 
 export const Employees = () => {
   const { user } = useAppSelector((state) => state.user);
@@ -79,13 +87,19 @@ export const Employees = () => {
       </div>
 
       <div className="mb-6">
-        <button
+        {/* <button
           onClick={() => navigate("/dashboard/employees/create")}
           className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Add Employee
-        </button>
+        </button> */}
+        <Button
+          text="Add Employee"
+          varient="primary"
+          startIcon={<Plus className="w-4 h-4" />}
+          onClick={() => navigate("/dashboard/employees/create")}
+        />
       </div>
 
       {isLoading ? (

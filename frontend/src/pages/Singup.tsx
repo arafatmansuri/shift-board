@@ -2,6 +2,9 @@ import { Calendar } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { Button } from "../components/Button";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
 import { useAppDispatch } from "../hooks";
 import { useCompanyMutation } from "../queries/companyQueries";
 import { setCredentials } from "../store/userSlice";
@@ -20,12 +23,17 @@ export const Signup = () => {
     companyMutation.mutate({ data, endpoint: "create", method: "POST" });
   };
   useEffect(() => {
-    dispatch(
-      setCredentials({ user: companyMutation.data || null, isAuthorized: true })
-    );
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 2000);
+    if (companyMutation.isSuccess) {
+      dispatch(
+        setCredentials({
+          user: companyMutation.data || null,
+          isAuthorized: true,
+        })
+      );
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+    }
   }, [companyMutation.isSuccess]);
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
@@ -41,100 +49,65 @@ export const Signup = () => {
           </h2>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Company name
-              </label>
-              <input
-                type="text"
-                {...register("companyName", {
+            <Input
+              isError={errors["companyName"] ? true : false}
+              label={"Company name"}
+              placeholder={"Enter your company name"}
+              errorMessage={errors.companyName && errors.companyName.message}
+              formHook={{
+                ...register("companyName", {
                   required: "Company name is required",
-                })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your company name"
-              />
-              {errors.companyName && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.companyName.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Email
-              </label>
-              <input
-                type="email"
-                {...register("companyEmail", {
-                  required: "Email is required",
-                })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your username or email"
-              />
-              {errors.companyEmail && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.companyEmail.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Password
-              </label>
-              <input
-                type="password"
-                {...register("companyPassword", {
+                }),
+              }}
+            />
+            <Input
+              isError={errors["companyEmail"] ? true : false}
+              label={"Email"}
+              placeholder={"Enter your email"}
+              errorMessage={errors.companyEmail && errors.companyEmail.message}
+              formHook={{
+                ...register("companyEmail", {
+                  required: "Company email is required",
+                }),
+              }}
+              type={"email"}
+            />
+            <Input
+              isError={errors["companyPassword"] ? true : false}
+              label={"Password"}
+              placeholder={"Enter your password"}
+              errorMessage={
+                errors.companyPassword && errors.companyPassword.message
+              }
+              formHook={{
+                ...register("companyPassword", {
                   required: "Password is required",
-                })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your password"
-              />
-              {errors.companyPassword && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.companyPassword.message}
-                </p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Company size
-              </label>
-              <input
-                type="number"
-                {...register("companySize", { valueAsNumber: true })}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
-                placeholder="Enter your company size"
-              />
-              {errors.companySize && (
-                <p className="mt-1 text-sm text-red-600">
-                  {errors.companySize.message}
-                </p>
-              )}
-            </div>
+                }),
+              }}
+              type="password"
+            />
+            <Input
+              isError={errors["companySize"] ? true : false}
+              label={"Company size"}
+              placeholder={"Enter your company size"}
+              errorMessage={errors.companySize && errors.companySize.message}
+              formHook={{ ...register("companySize", { valueAsNumber: true }) }}
+              type="number"
+            />
 
             {companyMutation.isError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600">
-                  {companyMutation.error.message}
-                </p>
-              </div>
+              <Box message={companyMutation.error.message} type="error" />
             )}
             {companyMutation.isSuccess && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-600">
-                  Company registration successfull
-                </p>
-              </div>
+              <Box message={"Company registered successfully"} type="success" />
             )}
-
-            <button
+            <Button
+              isDisabled={companyMutation.isPending}
               type="submit"
-              disabled={companyMutation.isPending}
-              className="w-full py-2.5 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
-            >
-              {companyMutation.isPending ? "Registering..." : "Register"}
-            </button>
+              text={companyMutation.isPending ? "Registering..." : "Register"}
+              varient="primary"
+              isWidthFull={true}
+            />
           </form>
 
           <div className="mt-6 text-center">
