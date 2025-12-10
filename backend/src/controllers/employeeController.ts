@@ -1,4 +1,4 @@
-import { isValidObjectId, Types } from "mongoose";
+import { Types } from "mongoose";
 import z from "zod";
 import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
@@ -37,23 +37,19 @@ export const createEmployee: Handler = async (req, res) => {
       return;
     }
     const { email, employeeCode, password, username } = parsedEmployee.data;
-    const company = await Company.findOne({companyEmail:userEmail});
+    const company = await Company.findOne({ companyEmail: userEmail });
     if (!company) {
       res
         .status(StatusCode.NotFound)
         .json({ message: "Company not found", success: false });
       return;
     }
-    const employeeData = await User.findOne({
-      $and: [
-        { _id: company._id },
-        { $or: [{ email }, { employeeCode }, { username }] },
-      ],
-    });
-    if (employeeData) {
-      res
-        .status(StatusCode.InputError)
-        .json({ message: "Employee already exists", success: false });
+    const IsEmailExists = await User.findOne({ email });
+    if (IsEmailExists) {
+      res.status(StatusCode.InputError).json({
+        message: "Employee already exists with this email",
+        success: false,
+      });
       return;
     }
     const department = await Department.findById(
@@ -65,15 +61,27 @@ export const createEmployee: Handler = async (req, res) => {
         .json({ message: "Department not found", success: false });
       return;
     }
-    const employee = await User.create({
-      department: department._id,
-      email,
-      employeeCode,
-      password,
-      role: "employee",
-      username,
-      company: company._id,
-    });
+    let employee;
+    try {
+      employee = await User.create({
+        department: department._id,
+        email,
+        employeeCode,
+        password,
+        role: "employee",
+        username,
+        company: company._id,
+      });
+    } catch (err: any) {
+      if (err?.code === 11000) {
+        res.status(StatusCode.InputError).json({
+          message: "Employee already exists",
+          success: false,
+          error: err,
+        });
+        return;
+      }
+    }
     res.status(StatusCode.Created).json({
       message: "Employee created sucessfully",
       success: true,
@@ -84,6 +92,7 @@ export const createEmployee: Handler = async (req, res) => {
     res.status(StatusCode.ServerError).json({
       message: "Something went wrong from our side",
       success: false,
+      error,
     });
     return;
   }

@@ -116,13 +116,6 @@ export const Shifts = () => {
 
       {user?.role === "admin" && (
         <div className="mb-6 flex flex-wrap gap-4">
-          {/* <button
-            onClick={() => navigate("/dashboard/shifts/create")}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            Create Shift
-          </button> */}
           <Button
             text="Create Shift"
             varient="primary"

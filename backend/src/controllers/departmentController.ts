@@ -30,18 +30,6 @@ export const createDepartment: Handler = async (req, res) => {
         .json({ message: "Company not found", success: false });
       return;
     }
-    const departmentData = await Department.findOne({
-      $and: [
-        { _id: company._id },
-        { $or: [{ departmentCode }, { departmentName }] },
-      ],
-    });
-    if (departmentData) {
-      res
-        .status(StatusCode.InputError)
-        .json({ message: "Department already exists", success: false });
-      return;
-    }
     let manager;
     if (departmentManager) {
       manager = await User.findById(departmentManager);
@@ -53,12 +41,24 @@ export const createDepartment: Handler = async (req, res) => {
         return;
       }
     }
-    const department = await Department.create({
-      departmentCode,
-      departmentName,
-      departmentManager: manager && manager._id,
-      company: company._id,
-    });
+    let department;
+    try {
+      department = await Department.create({
+        departmentCode,
+        departmentName,
+        departmentManager: manager && manager._id,
+        company: company._id,
+      });
+    } catch (err: any) {
+      if (err?.code === 11000) {
+        res.status(StatusCode.InputError).json({
+          message: "Department already exists",
+          success: false,
+          error: err,
+        });
+        return;
+      }
+    }
     res.status(StatusCode.Created).json({
       message: "Department created sucessfully",
       success: true,

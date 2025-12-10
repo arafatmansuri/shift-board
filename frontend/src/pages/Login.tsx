@@ -104,7 +104,7 @@ export const Login = () => {
             </Link>
           </div>
         </div>
-        <div className="mt-10 bg-white rounded-xl shadow-lg p-8">
+        {/* <div className="mt-10 bg-white rounded-xl shadow-lg p-8">
           <h1 className="text-xl font-bold text-slate-800 mb-2">
             Demo Credentials:
           </h1>
@@ -134,7 +134,7 @@ export const Login = () => {
               </p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

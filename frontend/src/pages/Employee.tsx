@@ -81,13 +81,6 @@ export const Employees = () => {
       </div>
 
       <div className="mb-6">
-        {/* <button
-          onClick={() => navigate("/dashboard/employees/create")}
-          className="flex items-center gap-2 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          Add Employee
-        </button> */}
         <Button
           text="Add Employee"
           varient="primary"

@@ -96,47 +96,7 @@ export const DepartmentCard = ({
                 label={"manager"}
                 isLabel={false}
               />
-              {/* <select
-                name="employees"
-                className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-                title="select manager"
-                value={isAssignEnable.employeeId}
-                onChange={(e) => {
-                  setIsAssignEnable({
-                    id: department._id,
-                    employeeId: e.target.value,
-                    isEnable: true,
-                    employees: true,
-                  });
-                }}
-              >
-                {employees
-                  .filter(
-                    (e) =>
-                      typeof e.department == "object" &&
-                      e.department._id == department._id
-                  )
-                  .map((employee) => (
-                    <option value={employee._id} key={employee._id}>
-                      {employee.username} {employee.employeeCode}
-                    </option>
-                  ))}
-              </select> */}
               <div className="flex gap-2 items-center justify-center">
-                {/* <button
-                  type="button"
-                  onClick={() => {
-                    assignManager(isAssignEnable.employeeId, department._id);
-                    setIsAssignEnable({
-                      isEnable: false,
-                      id: "",
-                      employeeId: "",
-                    });
-                  }}
-                  className="p-2 px-4 text-black bg-slate-300 hover:bg-slate-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
-                >
-                  Assign
-                </button> */}
                 <Button
                   text={"Assign"}
                   varient="assign"
@@ -162,19 +122,6 @@ export const DepartmentCard = ({
                     })
                   }
                 />
-                {/* <button
-                  type="button"
-                  onClick={() =>
-                    setIsAssignEnable({
-                      isEnable: false,
-                      id: "",
-                      employeeId: "",
-                    })
-                  }
-                  className="p-2 px-4 text-black bg-red-400 hover:bg-red-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
-                >
-                  Cancel
-                </button> */}
               </div>
             </div>
           ) : (

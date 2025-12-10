@@ -8,7 +8,9 @@ import Input from "../components/Input";
 import Select from "../components/Select";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
+import { useEmployeeQuery } from "../queries/employeeQueries";
 import { useShiftMutation } from "../queries/shiftQueries";
+import { getEmployee } from "../store/employeeSlice";
 import { createShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Shift } from "../types";
@@ -22,9 +24,30 @@ export const CreateShift = () => {
   } = useForm<Shift>();
   const navigate = useNavigate();
   const { employees } = useAppSelector((state) => state.employees);
+  const { user } = useAppSelector((state) => state.user);
+  const employeesQuery = useEmployeeQuery(
+    typeof user?.company == "object" ? user.company._id : ""
+  );
   const shiftMutation = useShiftMutation();
   const dispatch = useAppDispatch();
   const RefTokenMutation = useLoginMutation();
+  useEffect(() => {
+    if (employeesQuery.isError && employeesQuery.error.status == 401) {
+      RefTokenMutation.mutate(
+        { endpoint: "refreshaccesstoken", method: "POST" },
+        {
+          onError() {
+            navigate("/login");
+          },
+        }
+      );
+    }
+  }, [shiftMutation.isError, shiftMutation.error]);
+  useEffect(() => {
+    if (employeesQuery.isSuccess) {
+      dispatch(getEmployee(employeesQuery.data));
+    }
+  }, [employeesQuery.isSuccess]);
   useEffect(() => {
     if (shiftMutation.isError && shiftMutation.error.status == 401) {
       RefTokenMutation.mutate(

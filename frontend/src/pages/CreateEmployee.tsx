@@ -8,7 +8,9 @@ import Input from "../components/Input";
 import Select from "../components/Select";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
+import { useDepartmentQuery } from "../queries/departmentQueries";
 import { useEmployeeMutation } from "../queries/employeeQueries";
+import { getDepartment } from "../store/departmentSlice";
 import {
   createEmployee,
   type CreateEmployeeData,
@@ -24,10 +26,31 @@ export const CreateEmployee = () => {
     formState: { errors },
   } = useForm<CreateEmployeeData>();
   const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.user);
   const { departments } = useAppSelector((state) => state.departments);
+  const departmentQuery = useDepartmentQuery(
+    typeof user?.company == "object" ? user.company._id : ""
+  );
   const employeeMutation = useEmployeeMutation<User>();
   const RefTokenMutation = useLoginMutation();
   const dispatch = useAppDispatch();
+  useEffect(() => {
+    if (departmentQuery.isError && departmentQuery.error.status == 401) {
+      RefTokenMutation.mutate(
+        { endpoint: "refreshaccesstoken", method: "POST" },
+        {
+          onError() {
+            navigate("/login");
+          },
+        }
+      );
+    }
+  }, [departmentQuery.isError, departmentQuery.error]);
+  useEffect(() => {
+    if (departmentQuery.isSuccess) {
+      dispatch(getDepartment(departmentQuery.data));
+    }
+  }, [departmentQuery.isSuccess]);
   useEffect(() => {
     if (employeeMutation.isError && employeeMutation.error.status == 401) {
       RefTokenMutation.mutate(
@@ -109,29 +132,6 @@ export const CreateEmployee = () => {
           }}
         />
 
-        {/* <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Department
-          </label>
-          <select
-            {...register("department", {
-              required: "Department is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          >
-            <option value="">Select Department</option>
-            {departments.map((dept: Department) => (
-              <option key={dept._id} value={dept._id}>
-                {dept.departmentName} ({dept.departmentCode})
-              </option>
-            ))}
-          </select>
-          {errors.department && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.department.message}
-            </p>
-          )}
-        </div> */}
         <Select
           isError={errors.department ? true : false}
           label={"Department"}
@@ -153,13 +153,6 @@ export const CreateEmployee = () => {
           <Box message={"Employee created successfully"} type="success" />
         )}
         <div className="flex gap-3 pt-4">
-          {/* <button
-            type="submit"
-            disabled={employeeMutation.isPending}
-            className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            {employeeMutation.isPending ? "Adding..." : "Add Employee"}
-          </button> */}
           <Button
             text={employeeMutation.isPending ? "Adding..." : "Add Employee"}
             varient="primary"
@@ -176,16 +169,6 @@ export const CreateEmployee = () => {
               reset();
             }}
           />
-          {/* <button
-            type="button"
-            onClick={() => {
-              navigate("/dashboard/employees");
-              reset();
-            }}
-            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-          >
-            Cancel
-          </button> */}
         </div>
       </form>
     </div>

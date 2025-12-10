@@ -40,6 +40,15 @@ const UserSchema = new Schema(
   }
 );
 
+UserSchema.index(
+  { company: 1, employeeCode: 1 },
+  { unique: true, name: "uniq_company_employeeCode" }
+);
+UserSchema.index(
+  { company: 1, username: 1 },
+  { unique: true, name: "uniq_company_username" }
+);
+
 UserSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;

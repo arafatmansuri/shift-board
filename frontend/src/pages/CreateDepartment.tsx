@@ -1,15 +1,15 @@
-import {  Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Button } from "../components/Button";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
 import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useDepartmentMutation } from "../queries/departmentQueries";
 import type { CreateDepartmentData } from "../store/departmentSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
-import { Box } from "../components/ErrorSuccessBox";
-import Input from "../components/Input";
 
 export const CreateDepartment = () => {
   const {
@@ -19,6 +19,7 @@ export const CreateDepartment = () => {
     formState: { errors },
   } = useForm<CreateDepartmentData>();
   const navigate = useNavigate();
+  // const {employees} = useAppSelector(state=>state.employees);
   const departmentMutation = useDepartmentMutation();
   const RefTokenMutation = useLoginMutation();
   const dispatch = useAppDispatch();
@@ -80,30 +81,20 @@ export const CreateDepartment = () => {
             }),
           }}
         />
-
-        {/* <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Department Manager
-          </label>
-          <select
-            {...register("departmentManager", {
-              required: "Manager is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          >
-            <option value="">Select Manager</option>
-            {employees.map((emp: User) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.username} ({emp.employeeCode})
-              </option>
-            ))}
-          </select>
-          {errors.departmentManager && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.departmentManager.message}
-            </p>
-          )}
-        </div> */}
+        {/* <Select
+          isError={errors.departmentManager ? true : false}
+          label={"Department manager"}
+          errorMessage={errors.departmentManager && errors.departmentManager.message}
+          formHook={{
+            ...register("departmentManager", {
+              required: "Department manager is required",
+            }),
+          }}
+          options={employees.map((e) => ({
+            value: e._id,
+            text: `${e.username} (${e.employeeCode})`,
+          }))}
+        /> */}
         {departmentMutation.isError && (
           <Box message={departmentMutation.error.message} type="error" />
         )}
@@ -111,13 +102,6 @@ export const CreateDepartment = () => {
           <Box message={"Department created successfully"} type="success" />
         )}
         <div className="flex gap-3 pt-4">
-          {/* <button
-            type="submit"
-            disabled={departmentMutation.isPending}
-            className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            {departmentMutation.isPending ? "Creating..." : "Create Department"}
-          </button> */}
           <Button
             text={
               departmentMutation.isPending ? "Creating..." : "Create Department"
@@ -136,16 +120,6 @@ export const CreateDepartment = () => {
               reset();
             }}
           />
-          {/* <button
-            type="button"
-            onClick={() => {
-              navigate("/dashboard/departments");
-              reset();
-            }}
-            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-          >
-            Cancel
-          </button> */}
         </div>
       </form>
     </div>
