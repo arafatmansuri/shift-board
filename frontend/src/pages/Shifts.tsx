@@ -1,12 +1,8 @@
-import {
-  Calendar as CalendarIcon,
-  Filter,
-  Menu,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Calendar as CalendarIcon, Filter, Menu, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
+import { Button } from "../components/Button";
+import { ShiftCard } from "../components/ShiftCard";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useEmployeeQuery } from "../queries/employeeQueries";
@@ -15,7 +11,6 @@ import { getEmployee } from "../store/employeeSlice";
 import { getShifts, removeShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Shift, User } from "../types";
-import { Button } from "../components/Button";
 
 export const Shifts = () => {
   const [filterDate, setFilterDate] = useState("");
@@ -202,42 +197,14 @@ export const Shifts = () => {
       ) : (
         <div className="grid gap-4">
           {shifts.map((shift: Shift) => (
-            <div
+            <ShiftCard
+              formatDate={formatDate}
+              getEmployeeName={getEmployeeName}
+              handleDelete={handleDelete}
+              role={user?.role || "employee"}
+              shift={shift}
               key={shift._id}
-              className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <CalendarIcon className="w-5 h-5 text-slate-600" />
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      {formatDate(shift.date)}
-                    </h3>
-                  </div>
-                  <div className="space-y-1 text-sm text-slate-600">
-                    <p>
-                      <span className="font-medium">Time:</span>{" "}
-                      {shift.startTime} - {shift.endTime}
-                    </p>
-                    <p>
-                      {user?.role == "admin" && (
-                        <span className="font-medium">Employee:</span>
-                      )}
-
-                      {user?.role == "admin" && getEmployeeName(shift)}
-                    </p>
-                  </div>
-                </div>
-                {user?.role === "admin" && (
-                  <button
-                    onClick={() => handleDelete(shift?._id || "")}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                )}
-              </div>
-            </div>
+            />
           ))}
         </div>
       )}

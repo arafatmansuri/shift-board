@@ -1,14 +1,8 @@
-import {
-  Hash,
-  Mail,
-  Menu,
-  Plus,
-  Trash2,
-  Users as UsersIcon,
-} from "lucide-react";
+import { Menu, Plus, Users as UsersIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Button } from "../components/Button";
+import { EmployeeCard } from "../components/EmployeeCard";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import {
@@ -114,50 +108,17 @@ export const Employees = () => {
       ) : (
         <div className="grid gap-4">
           {employees.map((employee: User) => (
-            <div
+            <EmployeeCard
+              code={employee.employeeCode}
+              department={employee.department}
+              email={employee.email}
+              getDepartmentName={getDepartmentName}
+              handleDelete={handleDelete}
+              id={employee._id}
+              name={employee.username}
+              role={employee.role}
               key={employee._id}
-              className="bg-white p-6 rounded-xl border border-slate-200 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center">
-                      <UsersIcon className="w-6 h-6 text-slate-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {employee.username}
-                      </h3>
-                      <span className="inline-block px-2 py-1 text-xs font-medium bg-slate-100 text-slate-700 rounded">
-                        {employee.role}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm text-slate-600 ml-15">
-                    <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" />
-                      <span>{employee.email}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Hash className="w-4 h-4" />
-                      <span>Code: {employee.employeeCode || "N/A"}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <UsersIcon className="w-4 h-4" />
-                      <span>
-                        Department: {getDepartmentName(employee.department)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => handleDelete(employee._id)}
-                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+            />
           ))}
         </div>
       )}

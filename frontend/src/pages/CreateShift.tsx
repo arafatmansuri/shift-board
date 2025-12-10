@@ -2,12 +2,16 @@ import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { Button } from "../components/Button";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
+import Select from "../components/Select";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useShiftMutation } from "../queries/shiftQueries";
 import { createShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
-import type { Shift, User } from "../types";
+import type { Shift } from "../types";
 
 export const CreateShift = () => {
   const {
@@ -58,107 +62,73 @@ export const CreateShift = () => {
         />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-3">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Date
-          </label>
-          <input
-            type="date"
-            {...register("date", { required: "Date is required" })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          />
-          {errors.date && (
-            <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Start Time
-          </label>
-          <input
-            type="time"
-            {...register("startTime", {
-              required: "Start time is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          />
-          {errors.startTime && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.startTime.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            End Time
-          </label>
-          <input
-            type="time"
-            {...register("endTime", { required: "End time is required" })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          />
-          {errors.endTime && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.endTime.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Employee
-          </label>
-          <select
-            {...register("employeeId", {
+        <Input
+          type="date"
+          isError={errors.date ? true : false}
+          label={"Shift date"}
+          placeholder="Enter date"
+          errorMessage={errors.date && errors.date.message}
+          formHook={{
+            ...register("date", { required: "Date is required" }),
+          }}
+        />
+        <Input
+          type="time"
+          isError={errors.startTime ? true : false}
+          label={"Start time"}
+          placeholder="Enter start time"
+          errorMessage={errors.startTime && errors.startTime.message}
+          formHook={{
+            ...register("startTime", { required: "Start time is required" }),
+          }}
+        />
+        <Input
+          type="time"
+          isError={errors.endTime ? true : false}
+          label={"End time"}
+          placeholder="Enter end time"
+          errorMessage={errors.endTime && errors.endTime.message}
+          formHook={{
+            ...register("endTime", { required: "End time is required" }),
+          }}
+        />
+        <Select
+          isError={errors.employeeId ? true : false}
+          label={"Employee"}
+          errorMessage={errors.employeeId && errors.employeeId.message}
+          formHook={{
+            ...register("employeeId", {
               required: "Employee is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          >
-            <option value="">Select Employee</option>
-            {employees.map((emp: User) => (
-              <option key={emp._id} value={emp._id}>
-                {emp.username} ({emp.employeeCode})
-              </option>
-            ))}
-          </select>
-          {errors.employeeId && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.employeeId.message}
-            </p>
-          )}
-        </div>
+            }),
+          }}
+          options={employees.map((e) => ({
+            value: e._id,
+            text: `${e.username} (${e.employeeCode})`,
+          }))}
+        />
         {shiftMutation.isError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">
-              {shiftMutation.error.message}
-            </p>
-          </div>
+          <Box message={shiftMutation.error.message} type="error" />
         )}
         {shiftMutation.isSuccess && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-600">Shift created successfully</p>
-          </div>
+          <Box message={"Shift created successfully"} type="success" />
         )}
         <div className="flex gap-3 pt-4">
-          <button
+          <Button
+            text={shiftMutation.isPending ? "Creating..." : "Create Shift"}
+            varient="primary"
+            isDisabled={shiftMutation.isPending}
             type="submit"
-            disabled={shiftMutation.isPending}
-            className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
-          >
-            {shiftMutation.isPending ? "Creating..." : "Create Shift"}
-          </button>
-          <button
-            type="button"
+            classes="font-normal flex-1"
+          />
+          <Button
+            text={"Cancel"}
+            varient="secondary"
+            type="reset"
             onClick={() => {
               navigate("/dashboard/shifts");
               reset();
             }}
-            className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
-          >
-            Cancel
-          </button>
+          />
         </div>
       </form>
     </div>

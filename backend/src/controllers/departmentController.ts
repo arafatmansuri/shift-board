@@ -60,7 +60,7 @@ export const createDepartment: Handler = async (req, res) => {
       company: company._id,
     });
     res.status(StatusCode.Created).json({
-      message: "Departments created sucessfully",
+      message: "Department created sucessfully",
       success: true,
       department,
     });

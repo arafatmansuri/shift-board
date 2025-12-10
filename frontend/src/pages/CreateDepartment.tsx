@@ -1,12 +1,15 @@
-import { Menu } from "lucide-react";
+import {  Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { Button } from "../components/Button";
 import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useDepartmentMutation } from "../queries/departmentQueries";
 import type { CreateDepartmentData } from "../store/departmentSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
 
 export const CreateDepartment = () => {
   const {
@@ -55,43 +58,28 @@ export const CreateDepartment = () => {
         />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Department Name
-          </label>
-          <input
-            type="text"
-            {...register("departmentName", {
+        <Input
+          isError={errors.departmentName ? true : false}
+          label={"Department name"}
+          placeholder="Enter department name"
+          errorMessage={errors.departmentName && errors.departmentName.message}
+          formHook={{
+            ...register("departmentName", {
               required: "Department name is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter department name"
-          />
-          {errors.departmentName && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.departmentName.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Department Code
-          </label>
-          <input
-            type="text"
-            {...register("departmentCode", {
+            }),
+          }}
+        />
+        <Input
+          isError={errors.departmentCode ? true : false}
+          label={"Department Code"}
+          placeholder="Enter department code"
+          errorMessage={errors.departmentCode && errors.departmentCode.message}
+          formHook={{
+            ...register("departmentCode", {
               required: "Department code is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter department code"
-          />
-          {errors.departmentCode && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.departmentCode.message}
-            </p>
-          )}
-        </div>
+            }),
+          }}
+        />
 
         {/* <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
@@ -117,28 +105,38 @@ export const CreateDepartment = () => {
           )}
         </div> */}
         {departmentMutation.isError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">
-              {departmentMutation.error.message}
-            </p>
-          </div>
+          <Box message={departmentMutation.error.message} type="error" />
         )}
         {departmentMutation.isSuccess && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-600">
-              Department created successfully
-            </p>
-          </div>
+          <Box message={"Department created successfully"} type="success" />
         )}
         <div className="flex gap-3 pt-4">
-          <button
+          {/* <button
             type="submit"
             disabled={departmentMutation.isPending}
             className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {departmentMutation.isPending ? "Creating..." : "Create Department"}
-          </button>
-          <button
+          </button> */}
+          <Button
+            text={
+              departmentMutation.isPending ? "Creating..." : "Create Department"
+            }
+            varient="primary"
+            isDisabled={departmentMutation.isPending}
+            type="submit"
+            classes="font-normal flex-1"
+          />
+          <Button
+            text={"Cancel"}
+            varient="secondary"
+            type="reset"
+            onClick={() => {
+              navigate("/dashboard/departments");
+              reset();
+            }}
+          />
+          {/* <button
             type="button"
             onClick={() => {
               navigate("/dashboard/departments");
@@ -147,7 +145,7 @@ export const CreateDepartment = () => {
             className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
           >
             Cancel
-          </button>
+          </button> */}
         </div>
       </form>
     </div>

@@ -2,6 +2,10 @@ import { Menu } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { Button } from "../components/Button";
+import { Box } from "../components/ErrorSuccessBox";
+import Input from "../components/Input";
+import Select from "../components/Select";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { useEmployeeMutation } from "../queries/employeeQueries";
@@ -10,7 +14,7 @@ import {
   type CreateEmployeeData,
 } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
-import type { Department, User } from "../types";
+import type { User } from "../types";
 
 export const CreateEmployee = () => {
   const {
@@ -48,8 +52,8 @@ export const CreateEmployee = () => {
         onSuccess: () => {
           reset();
         },
-      },
-    )
+      }
+    );
   };
 
   return (
@@ -66,75 +70,46 @@ export const CreateEmployee = () => {
         />
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-3">
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Username
-          </label>
-          <input
-            type="text"
-            {...register("username", { required: "Username is required" })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter username"
-          />
-          {errors.username && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.username.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Email
-          </label>
-          <input
-            type="email"
-            {...register("email", { required: "Email is required" })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter email"
-          />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Password
-          </label>
-          <input
-            type="password"
-            {...register("password", { required: "Password is required" })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter password"
-          />
-          {errors.password && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">
-            Employee Code
-          </label>
-          <input
-            type="text"
-            {...register("employeeCode", {
+        <Input
+          isError={errors.username ? true : false}
+          label={"Username"}
+          placeholder="Enter username"
+          errorMessage={errors.username && errors.username.message}
+          formHook={{
+            ...register("username", { required: "Username is required" }),
+          }}
+        />
+        <Input
+          isError={errors.email ? true : false}
+          label={"Email"}
+          placeholder="Enter email"
+          errorMessage={errors.email && errors.email.message}
+          formHook={{
+            ...register("email", { required: "Email is required" }),
+          }}
+        />
+        <Input
+          isError={errors.password ? true : false}
+          label={"Password"}
+          placeholder="Enter password"
+          errorMessage={errors.password && errors.password.message}
+          formHook={{
+            ...register("password", { required: "Password is required" }),
+          }}
+        />
+        <Input
+          isError={errors.employeeCode ? true : false}
+          label={"Employee code"}
+          placeholder="Enter employee code"
+          errorMessage={errors.employeeCode && errors.employeeCode.message}
+          formHook={{
+            ...register("employeeCode", {
               required: "Employee code is required",
-            })}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-            placeholder="Enter employee code"
-          />
-          {errors.employeeCode && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.employeeCode.message}
-            </p>
-          )}
-        </div>
+            }),
+          }}
+        />
 
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-slate-700 mb-2">
             Department
           </label>
@@ -156,30 +131,52 @@ export const CreateEmployee = () => {
               {errors.department.message}
             </p>
           )}
-        </div>
+        </div> */}
+        <Select
+          isError={errors.department ? true : false}
+          label={"Department"}
+          errorMessage={errors.department && errors.department.message}
+          formHook={{
+            ...register("department", {
+              required: "Department is required",
+            }),
+          }}
+          options={departments.map((d) => ({
+            value: d._id,
+            text: `${d.departmentName} (${d.departmentCode})`,
+          }))}
+        />
         {employeeMutation.isError && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">
-              {employeeMutation.error.message}
-            </p>
-          </div>
+          <Box message={employeeMutation.error.message} type="error" />
         )}
         {employeeMutation.isSuccess && (
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm text-green-600">
-              Employee created successfully
-            </p>
-          </div>
+          <Box message={"Employee created successfully"} type="success" />
         )}
         <div className="flex gap-3 pt-4">
-          <button
+          {/* <button
             type="submit"
             disabled={employeeMutation.isPending}
             className="flex-1 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors disabled:opacity-50 cursor-pointer"
           >
             {employeeMutation.isPending ? "Adding..." : "Add Employee"}
-          </button>
-          <button
+          </button> */}
+          <Button
+            text={employeeMutation.isPending ? "Adding..." : "Add Employee"}
+            varient="primary"
+            isDisabled={employeeMutation.isPending}
+            type="submit"
+            classes="font-normal flex-1"
+          />
+          <Button
+            text={"Cancel"}
+            varient="secondary"
+            type="reset"
+            onClick={() => {
+              navigate("/dashboard/employees");
+              reset();
+            }}
+          />
+          {/* <button
             type="button"
             onClick={() => {
               navigate("/dashboard/employees");
@@ -188,7 +185,7 @@ export const CreateEmployee = () => {
             className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors cursor-pointer"
           >
             Cancel
-          </button>
+          </button> */}
         </div>
       </form>
     </div>

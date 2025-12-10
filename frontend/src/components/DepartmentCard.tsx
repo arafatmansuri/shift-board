@@ -1,6 +1,8 @@
 import { Building2, Hash, Trash2, User } from "lucide-react";
 import { type ReactNode } from "react";
 import type { Department, User as UserType } from "../types";
+import { Button } from "./Button";
+import Select from "./Select";
 export type IsAssignEnable = {
   isEnable: boolean;
   id: string;
@@ -70,7 +72,31 @@ export const DepartmentCard = ({
           isAssignEnable.employees &&
           isAssignEnable.id == department._id ? (
             <div className="md:flex-row flex-col flex gap-2">
-              <select
+              <Select
+                title="select manager"
+                options={employees
+                  .filter(
+                    (e) =>
+                      typeof e.department == "object" &&
+                      e.department._id == department._id
+                  )
+                  .map((emp) => ({
+                    value: emp._id,
+                    text: `${emp.username} (${emp.employeeCode})`,
+                  }))}
+                onChange={(e) => {
+                  setIsAssignEnable({
+                    id: department._id,
+                    employeeId: e.target.value,
+                    isEnable: true,
+                    employees: true,
+                  });
+                }}
+                value={isAssignEnable.employeeId}
+                label={"manager"}
+                isLabel={false}
+              />
+              {/* <select
                 name="employees"
                 className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
                 title="select manager"
@@ -95,9 +121,9 @@ export const DepartmentCard = ({
                       {employee.username} {employee.employeeCode}
                     </option>
                   ))}
-              </select>
+              </select> */}
               <div className="flex gap-2 items-center justify-center">
-                <button
+                {/* <button
                   type="button"
                   onClick={() => {
                     assignManager(isAssignEnable.employeeId, department._id);
@@ -110,8 +136,33 @@ export const DepartmentCard = ({
                   className="p-2 px-4 text-black bg-slate-300 hover:bg-slate-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
                 >
                   Assign
-                </button>
-                <button
+                </button> */}
+                <Button
+                  text={"Assign"}
+                  varient="assign"
+                  type="button"
+                  onClick={() => {
+                    assignManager(isAssignEnable.employeeId, department._id);
+                    setIsAssignEnable({
+                      isEnable: false,
+                      id: "",
+                      employeeId: "",
+                    });
+                  }}
+                />
+                <Button
+                  text={"Cancel"}
+                  varient="secondary"
+                  type="reset"
+                  onClick={() =>
+                    setIsAssignEnable({
+                      isEnable: false,
+                      id: "",
+                      employeeId: "",
+                    })
+                  }
+                />
+                {/* <button
                   type="button"
                   onClick={() =>
                     setIsAssignEnable({
@@ -123,12 +174,15 @@ export const DepartmentCard = ({
                   className="p-2 px-4 text-black bg-red-400 hover:bg-red-500 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
                 >
                   Cancel
-                </button>
+                </button> */}
               </div>
             </div>
           ) : (
             <div className="flex">
-              <button
+              <Button
+                text={"Assign manager"}
+                varient="assign"
+                type="button"
                 onClick={() => {
                   const emp = employees.filter(
                     (e) =>
@@ -142,10 +196,8 @@ export const DepartmentCard = ({
                     employees: emp.length > 0 ? true : false,
                   });
                 }}
-                className="p-2 md:px-4 text-black bg-slate-200 hover:bg-slate-300 rounded-lg transition-colors cursor-pointer font-semibold text-sm md:text-[12pt]"
-              >
-                Assign manager
-              </button>
+                classes="md:px-4"
+              />
               <button
                 onClick={() => handleDelete(department._id)}
                 className={`p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer`}
