@@ -11,6 +11,7 @@ import { getEmployee } from "../store/employeeSlice";
 import { getShifts, removeShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Shift, User } from "../types";
+import { setCredentials } from "../store/userSlice";
 
 export const Shifts = () => {
   const [filterDate, setFilterDate] = useState("");
@@ -47,6 +48,7 @@ export const Shifts = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError: () => {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
           onSuccess: () => {

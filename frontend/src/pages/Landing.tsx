@@ -1,8 +1,9 @@
 import { Building2, Calendar, Users } from "lucide-react";
-import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { LandingCard } from "../components/LandingCard";
 import { Navbar } from "../components/Navbar";
+import { useAppSelector } from "../hooks";
 
 const cards: { title: string; description: string; icon: ReactNode }[] = [
   {
@@ -26,6 +27,13 @@ const cards: { title: string; description: string; icon: ReactNode }[] = [
 ];
 
 const LandingPage = () => {
+  const { user } = useAppSelector((state) => state.user);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user]);
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100">
       <Navbar />

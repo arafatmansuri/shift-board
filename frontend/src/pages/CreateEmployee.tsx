@@ -17,6 +17,7 @@ import {
 } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { User } from "../types";
+import { setCredentials } from "../store/userSlice";
 
 export const CreateEmployee = () => {
   const {
@@ -40,6 +41,7 @@ export const CreateEmployee = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError() {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
         }

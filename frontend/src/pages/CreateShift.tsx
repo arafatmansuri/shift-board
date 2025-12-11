@@ -14,6 +14,7 @@ import { getEmployee } from "../store/employeeSlice";
 import { createShift } from "../store/shiftSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Shift } from "../types";
+import { setCredentials } from "../store/userSlice";
 
 export const CreateShift = () => {
   const {
@@ -37,6 +38,7 @@ export const CreateShift = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError() {
+            dispatch(setCredentials({ user: null, isAuthorized: false }));
             navigate("/login");
           },
         }
@@ -54,6 +56,7 @@ export const CreateShift = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError() {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
         }

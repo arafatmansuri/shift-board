@@ -14,6 +14,7 @@ import { getEmployee } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import type { Department, User as UserType } from "../types";
 import { Button } from "../components/Button";
+import { setCredentials } from "../store/userSlice";
 export const Departments = () => {
   const { user } = useAppSelector((state) => state.user);
   const [isAssignEnable, setIsAssignEnable] = useState<{
@@ -56,6 +57,7 @@ export const Departments = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError: () => {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
           onSuccess: () => {

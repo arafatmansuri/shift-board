@@ -1,4 +1,4 @@
-import { Calendar } from "lucide-react";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../components/Button";
@@ -33,7 +33,14 @@ export const Login = () => {
   return (
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-xl shadow-lg p-8 pt-4">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer self-start mb-3 -ml-5"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </button>
           <div className="flex items-center justify-center gap-2 mb-8">
             <Calendar className="w-10 h-10 text-slate-700" />
             <h1 className="text-2xl font-bold text-slate-900">ShiftBoard</h1>

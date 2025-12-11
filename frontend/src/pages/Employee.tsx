@@ -12,6 +12,7 @@ import {
 import { getEmployee } from "../store/employeeSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
 import { type Department, type User } from "../types";
+import { setCredentials } from "../store/userSlice";
 
 export const Employees = () => {
   const { user } = useAppSelector((state) => state.user);
@@ -37,6 +38,7 @@ export const Employees = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError: () => {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
           onSuccess: () => {

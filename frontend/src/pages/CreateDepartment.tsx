@@ -10,6 +10,7 @@ import { useLoginMutation } from "../queries/authQueries";
 import { useDepartmentMutation } from "../queries/departmentQueries";
 import type { CreateDepartmentData } from "../store/departmentSlice";
 import { toggleSidebar } from "../store/sidebarSlice";
+import { setCredentials } from "../store/userSlice";
 
 export const CreateDepartment = () => {
   const {
@@ -29,6 +30,7 @@ export const CreateDepartment = () => {
         { endpoint: "refreshaccesstoken", method: "POST" },
         {
           onError() {
+            dispatch(setCredentials({user:null,isAuthorized:false}))
             navigate("/login");
           },
         }
