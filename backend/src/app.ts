@@ -8,11 +8,8 @@ import employeeRouter from "./routes/employee";
 import shiftRouter from "./routes/shiftRoutes";
 const app = express();
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "https://shift-board-sigma.vercel.app",
-];
+const allowedOrigins = process.env.allowedOrigins?.split(",") || [];
+
 app.use(express.json());
 app.use(
   cors({
@@ -29,7 +26,10 @@ app.use(
 app.use(cookieParser());
 
 app.get("/api/health-check", (req, res) => {
-  res.json({ message: "server health is fine!" });
+  res.json({
+    message: "server health is fine!",
+    orgs: process.env.allowedOrigins?.split(","),
+  });
 });
 
 app.use("/api/auth", authRouter);
