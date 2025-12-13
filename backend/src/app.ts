@@ -8,7 +8,12 @@ import employeeRouter from "./routes/employee";
 import shiftRouter from "./routes/shiftRoutes";
 const app = express();
 
-const allowedOrigins = process.env.allowedOrigins?.split(",") || [];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://shift-board-sigma.vercel.app",
+  "https://shiftboard.mohammedarafat.me",
+];
 
 app.use(express.json());
 app.use(
@@ -28,7 +33,7 @@ app.use(cookieParser());
 app.get("/api/health-check", (req, res) => {
   res.json({
     message: "server health is fine!",
-    orgs: process.env.allowedOrigins?.split(","),
+    orgs: console.log(process.env.allowedOrigins?.split(",")),
   });
 });
 
