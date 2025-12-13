@@ -6,6 +6,7 @@ import companyRouter from "./routes/companyRoutes";
 import departmentRouter from "./routes/departmentRoutes";
 import employeeRouter from "./routes/employee";
 import shiftRouter from "./routes/shiftRoutes";
+
 const app = express();
 
 const allowedOrigins = [
@@ -33,7 +34,7 @@ app.use(cookieParser());
 app.get("/api/health-check", (req, res) => {
   res.json({
     message: "server health is fine!",
-    orgs: console.log(process.env.allowedOrigins?.split(",")),
+    id: process.pid,
   });
 });
 
