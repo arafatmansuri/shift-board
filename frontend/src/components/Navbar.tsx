@@ -1,6 +1,8 @@
 import { Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 export const Navbar = () => {
+  const isDesktop: boolean = useMediaQuery("(min-width:768px)");
   return (
     <nav className="bg-white shadow-sm max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
       {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> */}
@@ -14,13 +16,13 @@ export const Navbar = () => {
         <div className="flex gap-2">
           <Link
             to="/register"
-            className="md:px-4 md:py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors p-2"
+            className="md:px-4 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors px-4 py-2"
           >
-            Register your company
+            Register {isDesktop && "your company"}
           </Link>
           <Link
             to="/login"
-            className="md:px-6 md:py-2 border border-slate-300 bg-slate-200 text-slate-900 font-medium rounded-lg hover:bg-slate-300 transition-colors cursor-pointer p-2 px-4"
+            className="md:px-6 py-2 border border-slate-300 bg-slate-200 text-slate-900 font-medium rounded-lg hover:bg-slate-300 transition-colors cursor-pointer px-4"
             // className="px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium"
           >
             Login
