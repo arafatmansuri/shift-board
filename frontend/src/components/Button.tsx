@@ -16,7 +16,7 @@ const variantStyles = {
   secondary:
     "px-6 py-2.5 border border-slate-300 text-slate-700 hover:bg-slate-50",
   assign:
-    "py-2.5 px-6 text-black bg-slate-300 hover:bg-slate-400 font-semibold text-sm md:text-[12pt]",
+    "py-2.5 md:px-6 px-3 text-black bg-slate-300 hover:bg-slate-400 font-semibold text-sm md:text-[12pt]",
 };
 // const sizeStyles = {
 //   lg: "py-2 px-5 gap-1 text-lg",
