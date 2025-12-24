@@ -37,10 +37,10 @@ const LandingPage = () => {
   return (
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-16">
-          <h1 className="text-5xl font-bold text-slate-900 mb-4">
+          <h1 className="md:text-5xl text-3xl font-bold text-slate-900 mb-4">
             Employee Shift Management Made Simple
           </h1>
-          <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+          <p className="md:text-xl text-slate-600 max-w-2xl mx-auto">
             Streamline your workforce scheduling with our intuitive shift board
             system. Perfect for managing employees, departments, and schedules
             all in one place.
@@ -48,7 +48,7 @@ const LandingPage = () => {
           <div className="mt-8 flex gap-5 justify-center">
             <Link
               to="/register"
-              className="inline-block px-8 py-3 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
+              className="inline-block px-8 md:py-3 py-2 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
               // className="inline-block px-8 py-3 bg-slate-700 text-white text-lg rounded-lg hover:bg-slate-800 transition-colors shadow-lg"
             >
               Get Started

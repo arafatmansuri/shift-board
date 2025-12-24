@@ -1,13 +1,14 @@
 import { Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 export const Navbar = () => {
   const isDesktop: boolean = useMediaQuery("(min-width:768px)");
+  const navigate = useNavigate();
   return (
     <nav className="bg-white shadow-sm max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
       {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"> */}
       <div className="flex justify-between items-center h-16 gap-4">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer" onClick={()=>navigate("/")}>
           <Calendar className="md:w-8 md:h-8 text-slate-700" />
           <span className="md:text-xl font-semibold text-slate-800">
             ShiftBoard

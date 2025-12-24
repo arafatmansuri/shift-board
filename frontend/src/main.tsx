@@ -10,7 +10,7 @@ import "./index.css";
 import { CreateDepartment } from "./pages/CreateDepartment.tsx";
 import { CreateEmployee } from "./pages/CreateEmployee.tsx";
 import { CreateShift } from "./pages/CreateShift.tsx";
-import { Dashboard } from "./pages/Dashboard.tsx";
+import { DashboardLayout } from "./layouts/DashboardLayout.tsx";
 import { Departments } from "./pages/Departments.tsx";
 import { Employees } from "./pages/Employee.tsx";
 import { Shifts } from "./pages/Shifts.tsx";
@@ -45,7 +45,7 @@ createRoot(document.getElementById("root")!).render(
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardLayout />
                 </ProtectedRoute>
               }
             >
