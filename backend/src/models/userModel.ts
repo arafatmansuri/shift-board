@@ -49,7 +49,7 @@ UserSchema.index(
   { unique: true, name: "uniq_company_username" }
 );
 
-UserSchema.pre("save", async function () {
+/*UserSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;
   }
@@ -57,5 +57,5 @@ UserSchema.pre("save", async function () {
     this.password = await bcrypt.hash(this.password, 10);
     return;
   }
-});
+}); */
 export const User = model("User", UserSchema);

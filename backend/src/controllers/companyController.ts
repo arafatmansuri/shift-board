@@ -157,7 +157,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
     });
     const newOtp = await OTP.create({
       companyEmail,
-      otp:Number(otp),
+      otp: Number(otp),
       subject: "OTP for user signup",
       companyPassword: bcrypt.hashSync(companyPassword, 10),
       companyName,
@@ -181,6 +181,73 @@ export const createCompanySendOTP: Handler = async (req, res) => {
       message: "Something went wrong from our side",
       success: false,
       error,
+    });
+    return;
+  }
+};
+export const createCompanyOTPVerification: Handler = async (
+  req,
+  res
+): Promise<void> => {
+  try {
+    const parsedOTP = Number(req.body.otp);
+    if (!parsedOTP) {
+      res.status(StatusCode.NotFound).json({ message: "OTP not found" });
+      return;
+    }
+    const { companyEmail } = req.cookies.otp_data;
+    const IsOtpExists = await OTP.find({ companyEmail, type: "signup" })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    if (IsOtpExists.length === 0 || parsedOTP !== IsOtpExists[0]?.otp) {
+      res.status(StatusCode.NotFound).json({
+        message: "Invalid OTP",
+      });
+      return;
+    }
+    const newCompany = await Company.create({
+      companyEmail,
+      companyName: IsOtpExists[0].companyName,
+      companyPassword: IsOtpExists[0].companyPassword as string,
+      companySize: IsOtpExists[0].companySize,
+    });
+    const newUser = await User.create({
+      username: `Admin@${IsOtpExists[0].companyName}`.replace(" ", ""),
+      company: newCompany._id,
+      email: companyEmail,
+      password: IsOtpExists[0].companyPassword,
+      role: "admin",
+    });
+    await OTP.deleteMany({ companyEmail, type: "signup" });
+    const { accessToken, refreshToken } =
+      newUser.generateAccessAndRefreshToken();
+    const user = await User.findByIdAndUpdate(newUser._id, {
+      $set: { refreshToken },
+    })
+      .select("-password -refreshToken")
+      .populate("company", "-companyPassword");
+    const cookieOptions: CookieOptions = {
+      sameSite: "none",
+      secure: true,
+      path: "/",
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+    };
+    res
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .status(StatusCode.Created)
+      .json({
+        message: "Company created successfully",
+        company: newCompany,
+        user,
+        success: true,
+      });
+    return;
+  } catch (err: any) {
+    res.status(StatusCode.ServerError).json({
+      message: err.message || "Something went wrong from our side",
+      err,
     });
     return;
   }

@@ -7,7 +7,7 @@ const CompanySchema = new Schema({
   companySize: { type: Number},
 });
 
-CompanySchema.pre("save", async function () {
+/*CompanySchema.pre("save", async function () {
   if (!this.isModified("companyPassword")) {
     return;
   }
@@ -15,6 +15,6 @@ CompanySchema.pre("save", async function () {
     this.companyPassword = await bcrypt.hash(this.companyPassword, 10);
     return;
   }
-});
+});*/
 
 export const Company = model("Company",CompanySchema);
