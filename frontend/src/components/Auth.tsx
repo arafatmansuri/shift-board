@@ -11,7 +11,66 @@ import { Button } from "./Button";
 import { Box } from "./ErrorSuccessBox";
 import Input from "./Input";
 
-export const Auth = ({ type }: { type: "register" | "login" }) => {
+type AuthProps = {
+  type: "register" | "login" | "forgotMail" | "forgotOTP" | "registerOTP";
+};
+
+const formHeader = {
+  register: "Register your company",
+  login: "Login to your account",
+  forgotMail: "Forgot Password",
+  forgotOTP: "Forgot Password",
+  registerOTP: "Verify your email",
+};
+
+const buttonText = {
+  register: { isPending: "Registering...", default: "Register" },
+  login: { isPending: "Logging in...", default: "Login" },
+  forgotMail: {
+    isPending: "Sending reset email...",
+    default: "Send Reset Email",
+  },
+  forgotOTP: { isPending: "Resetting password...", default: "Reset Password" },
+  registerOTP: { isPending: "Verifying email...", default: "Verify Email" },
+};
+
+const successMessage = {
+  register: "Company registered successfully",
+  login: "Logged in successfully",
+  forgotMail: "Password reset email sent",
+  forgotOTP: "Password reset successfully",
+  registerOTP: "Email verified successfully",
+};
+
+const additionalText = {
+  register: {
+    question: "Already registered? ",
+    linkText: "Login",
+    linkTo: "/login",
+  },
+  login: {
+    question: "Don't have an account? ",
+    linkText: "Register",
+    linkTo: "/register",
+  },
+  forgotMail: {
+    question: "Remembered your password? ",
+    linkText: "Login",
+    linkTo: "/login",
+  },
+  forgotOTP: {
+    question: "Go back to login? ",
+    linkText: "Login",
+    linkTo: "/login",
+  },
+  registerOTP: {
+    question: "Go back to login? ",
+    linkText: "Login",
+    linkTo: "/login",
+  },
+};
+
+export const Auth = ({ type }: AuthProps) => {
   const {
     register,
     handleSubmit,
@@ -24,7 +83,7 @@ export const Auth = ({ type }: { type: "register" | "login" }) => {
   const onSubmit = (data: AuthRequest) => {
     if (type == "register")
       companyMutation.mutate({ data, endpoint: "create", method: "POST" });
-    else loginMutation.mutate({ data, endpoint: "login", method: "POST" });
+    else loginMutation.mutate({ data, endpoint: type, method: "POST" });
   };
   useEffect(() => {
     if (companyMutation.isSuccess || loginMutation.isSuccess) {
@@ -50,55 +109,89 @@ export const Auth = ({ type }: { type: "register" | "login" }) => {
             <ArrowLeft className="h-4 w-4" />
             Back to Home
           </button>
-          <div className="flex items-center justify-center gap-2 mb-6">
-            <Calendar className="w-10 h-10 text-slate-700" />
-            <h1 className="text-2xl font-bold text-slate-900">ShiftBoard</h1>
-          </div>
-
-          <h2 className="text-xl font-semibold text-slate-900 mb-6 text-center">
-            {type == "register"
-              ? "Register your company"
-              : "Login to your account"}
-          </h2>
-
+          {/* {type !== "forgotOTP" && type !== "registerOTP" && (
+            <div className="flex items-center justify-center gap-2 mb-6">
+              <Calendar className="w-10 h-10 text-slate-700" />
+              <h1 className="text-2xl font-bold text-slate-900">ShiftBoard</h1>
+            </div>
+          )} */}
+          {type !== "forgotOTP" && type !== "registerOTP" && (
+            <h2 className="text-xl font-semibold text-slate-900 mb-6 text-center">
+              {formHeader[type]}
+            </h2>
+          )}
+          {(type == "registerOTP" ||
+            type == "forgotOTP") && (
+              <p className="text-sm text-center mb-2">
+                OTP has been sent to your registered email. Please enter the OTP
+                {type == "forgotOTP"
+                  ? " and your new password to proceed."
+                  : "."}
+              </p>
+            )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-            <Input
-              isError={errors["companyName"] ? true : false}
-              label={"Company name"}
-              placeholder={"Enter your company name"}
-              errorMessage={errors.companyName && errors.companyName.message}
-              formHook={{
-                ...register("companyName", {
-                  required: "Company name is required",
-                }),
-              }}
-            />
-            <Input
-              isError={errors["companyEmail"] ? true : false}
-              label={"Email"}
-              placeholder={"Enter your email"}
-              errorMessage={errors.companyEmail && errors.companyEmail.message}
-              formHook={{
-                ...register("companyEmail", {
-                  required: "Company email is required",
-                }),
-              }}
-              type={"email"}
-            />
-            <Input
-              isError={errors["companyPassword"] ? true : false}
-              label={"Password"}
-              placeholder={"Enter your password"}
-              errorMessage={
-                errors.companyPassword && errors.companyPassword.message
-              }
-              formHook={{
-                ...register("companyPassword", {
-                  required: "Password is required",
-                }),
-              }}
-              type="password"
-            />
+            {type == "register" ||
+              (type == "login" && (
+                <Input
+                  isError={errors["companyName"] ? true : false}
+                  label={"Company name"}
+                  placeholder={"Enter your company name"}
+                  errorMessage={
+                    errors.companyName && errors.companyName.message
+                  }
+                  formHook={{
+                    ...register("companyName", {
+                      required: "Company name is required",
+                    }),
+                  }}
+                />
+              ))}
+            {type !== "forgotOTP" && type !== "registerOTP" && (
+              <Input
+                isError={errors["companyEmail"] ? true : false}
+                label={"Email"}
+                placeholder={"Enter your email"}
+                errorMessage={
+                  errors.companyEmail && errors.companyEmail.message
+                }
+                formHook={{
+                  ...register("companyEmail", {
+                    required: "Company email is required",
+                  }),
+                }}
+                type={"email"}
+              />
+            )}
+            {(type == "registerOTP" || type == "forgotOTP") && (
+              <Input
+                isError={errors["OTP"] ? true : false}
+                label={"OTP"}
+                placeholder={"Enter your OTP"}
+                errorMessage={errors.OTP && errors.OTP.message}
+                formHook={{
+                  ...register("OTP", {
+                    required: "OTP is required",
+                  }),
+                }}
+                type="number"
+              />
+            )}
+            {(type == "register" || type == "login" || type == "forgotOTP") && (
+              <Input
+                isError={errors["companyPassword"] ? true : false}
+                label={"Password"}
+                placeholder={"Enter your password"}
+                errorMessage={
+                  errors.companyPassword && errors.companyPassword.message
+                }
+                formHook={{
+                  ...register("companyPassword", {
+                    required: "Password is required",
+                  }),
+                }}
+                type="password"
+              />
+            )}
             {type == "register" && (
               <Input
                 isError={errors["companySize"] ? true : false}
@@ -119,22 +212,20 @@ export const Auth = ({ type }: { type: "register" | "login" }) => {
               <Box message={loginMutation.error.message} type="error" />
             )}
             {companyMutation.isSuccess && (
-              <Box message={"Company registered successfully"} type="success" />
+              <Box message={successMessage[type]} type="success" />
             )}
             {loginMutation.isSuccess && (
-              <Box message={"Logged in successfully"} type="success" />
+              <Box message={successMessage[type]} type="success" />
             )}
             <Button
               isDisabled={companyMutation.isPending || loginMutation.isPending}
               type="submit"
               text={
-                companyMutation.isPending || loginMutation.isPending
-                  ? type === "register"
-                    ? "Registering..."
-                    : "Logging in..."
-                  : type === "register"
-                  ? "Register"
-                  : "Login"
+                buttonText[type][
+                  companyMutation.isPending || loginMutation.isPending
+                    ? "isPending"
+                    : "default"
+                ]
               }
               varient="primary"
               isWidthFull={true}
@@ -142,13 +233,13 @@ export const Auth = ({ type }: { type: "register" | "login" }) => {
           </form>
 
           <div className="mt-6 text-center">
-            {type === "register" ? "Already registered? " : "Don't have an account? "}
+            {additionalText[type].question}
             <Link
-              to={type === "register" ? "/login" : "/register"}
+              to={additionalText[type].linkTo}
               className="text-blue-500 underline"
               // className="text-sm text-slate-600 hover:text-slate-900"
             >
-              {type === "register" ? "Login" : "Register"}
+              {additionalText[type].linkText}
             </Link>
           </div>
         </div>

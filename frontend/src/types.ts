@@ -46,10 +46,11 @@ export interface LoginRequest {
   password: string;
 }
 export interface AuthRequest {
-  companyName: string;
-  companyEmail: string;
-  companyPassword: string;
+  companyName?: string;
+  companyEmail?: string;
+  companyPassword?: string;
   companySize?: number;
+  OTP?: number;
 }
 
 export interface LoginResponse {
