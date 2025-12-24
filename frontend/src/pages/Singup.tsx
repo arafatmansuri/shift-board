@@ -9,6 +9,7 @@ import { useAppDispatch } from "../hooks";
 import { useCompanyMutation } from "../queries/companyQueries";
 import { setCredentials } from "../store/userSlice";
 import type { Company } from "../types";
+import { Auth } from "../components/Auth";
 
 export const Signup = () => {
   const {
@@ -132,3 +133,7 @@ export const Signup = () => {
     </div>
   );
 };
+
+export const Signup2 = () => {
+  return <Auth type="register"/>;
+}

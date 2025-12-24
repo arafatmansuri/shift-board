@@ -8,6 +8,7 @@ import { useAppDispatch } from "../hooks";
 import { useLoginMutation } from "../queries/authQueries";
 import { setCredentials } from "../store/userSlice";
 import type { LoginRequest } from "../types";
+import { Auth } from "../components/Auth";
 
 export const Login = () => {
   const {
@@ -146,3 +147,7 @@ export const Login = () => {
     </div>
   );
 };
+
+export const Login2 = () => {
+  return <Auth type="login"/>;
+}

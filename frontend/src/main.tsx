@@ -11,11 +11,11 @@ import { CreateShift } from "./pages/CreateShift.tsx";
 import { Dashboard } from "./pages/Dashboard.tsx";
 import { Departments } from "./pages/Departments.tsx";
 import { Employees } from "./pages/Employee.tsx";
-import { Login } from "./pages/Login.tsx";
+import { Login, Login2 } from "./pages/Login.tsx";
 import { Shifts } from "./pages/Shifts.tsx";
 import { store } from "./store/index.ts";
 import { CreateDepartment } from "./pages/CreateDepartment.tsx";
-import { Signup } from "./pages/Singup.tsx";
+import { Signup, Signup2 } from "./pages/Singup.tsx";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -24,8 +24,8 @@ createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />} index={true} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Signup />} />
+            <Route path="/login" element={<Login2 />} />
+            <Route path="/register" element={<Signup2 />} />
             <Route
               path="/dashboard"
               element={

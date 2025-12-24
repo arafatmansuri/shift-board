@@ -45,6 +45,12 @@ export interface LoginRequest {
   username?: string;
   password: string;
 }
+export interface AuthRequest {
+  companyName: string;
+  companyEmail: string;
+  companyPassword: string;
+  companySize?: number;
+}
 
 export interface LoginResponse {
   message: string;
@@ -59,7 +65,7 @@ export interface ApiResponse<T> {
 }
 
 export type UserFormData = {
-  data?: LoginRequest;
+  data?: AuthRequest;
   endpoint: string;
   method: "GET" | "POST" | "PUT" | "DELETE";
   token?: string;
@@ -72,5 +78,5 @@ export type DepartmentFormData = Omit<UserFormData, "data"> & {
   data?: CreateDepartmentData;
 };
 export type CompanyFormData = Omit<UserFormData, "data"> & {
-  data?: Company;
+  data?: AuthRequest;
 };

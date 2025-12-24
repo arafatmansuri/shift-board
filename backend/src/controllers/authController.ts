@@ -6,9 +6,8 @@ import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
 const loginSchema = z.object({
   companyName: z.string({ error: "company name must be string" }).trim(),
-  username: z.string({ error: "Username must be string" }).trim().optional(),
-  email: z.email({ error: "Invalid email address" }).optional(),
-  password: z.string({ error: "Password must be string" }),
+  companyEmail: z.email({ error: "Invalid email address" }),
+  companyPassword: z.string({ error: "Password must be string" }),
 });
 export const login: Handler = async (req, res) => {
   try {
@@ -21,7 +20,7 @@ export const login: Handler = async (req, res) => {
       });
       return;
     }
-    const { password, email, username, companyName } = loginParse.data;
+    const { companyPassword, companyEmail, companyName } = loginParse.data;
     const company = await Company.findOne({ companyName });
     if (!company) {
       res
@@ -29,7 +28,7 @@ export const login: Handler = async (req, res) => {
         .json({ message: "Company not found", success: false });
       return;
     }
-    const user = await User.findOne({ $or: [{ email }, { username }] })
+    const user = await User.findOne({ $and: [{ email: companyEmail }, { company: company._id }] })
       .select("-refreshToken")
       .populate("company", "-companyPassword");
     if (!user) {
@@ -38,7 +37,7 @@ export const login: Handler = async (req, res) => {
         .json({ message: "User not found", success: false });
       return;
     }
-    const isPasswordCorrect = user.comparePassword(password);
+    const isPasswordCorrect = user.comparePassword(companyPassword);
     if (!isPasswordCorrect) {
       res
         .status(StatusCode.NotFound)

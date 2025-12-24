@@ -17,7 +17,7 @@ export const companyQuery = async <T>({
     if (method == "GET") {
       return response.data;
     }
-    console.log(response.data);
+    // console.log(response.data);
     return response.data.user;
   } catch (err: any) {
     throw {
