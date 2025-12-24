@@ -181,6 +181,7 @@ export const Auth = ({ type }: AuthProps) => {
                 }),
               }}
               type="password"
+              forgotOption={type=="login"}
             />
           )}
           {type == "register" && (
