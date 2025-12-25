@@ -190,7 +190,7 @@ export const createCompanyOTPVerification: Handler = async (
   res
 ): Promise<void> => {
   try {
-    const parsedOTP = Number(req.body.otp);
+    const parsedOTP = Number(req.body.OTP);
     if (!parsedOTP) {
       res.status(StatusCode.NotFound).json({ message: "OTP not found" });
       return;

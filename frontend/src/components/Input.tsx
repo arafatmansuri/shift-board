@@ -47,6 +47,7 @@ const Input = ({
         placeholder={placeholder}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
+        defaultValue={type == "number" ? undefined : ""}
       />
       {type == "password" && !showPassword && inputValue && (
         <EyeIcon
