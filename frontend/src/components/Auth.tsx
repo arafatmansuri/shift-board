@@ -299,7 +299,7 @@ export const Auth = ({ type }: AuthProps) => {
             }}
             type="password"
             forgotOption={type == "login"}
-            inputVal={getValues("companyPassword")}
+            inputValue={getValues("companyPassword")}
           />
         )}
         {type == "register" && (
