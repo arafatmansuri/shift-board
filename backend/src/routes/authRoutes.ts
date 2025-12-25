@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { forgetOTPVerification, forgetSendOTP, login, logout, me, refreshAccessToken } from "../controllers/authController";
+import { forgetOTPVerification, forgetSendOTP, login, logout, me, refreshAccessToken, resenedOTP } from "../controllers/authController";
 import {
   adminMiddelware,
   employeeMiddelware,
@@ -15,4 +15,5 @@ authRouter.route("/refreshaccesstoken").post(refreshAccessToken);
 authRouter.route("/logout").post(logout);
 authRouter.route("/forgotpassword").post(forgetSendOTP);
 authRouter.route("/forgotpassword/verify").post(forgetOTPVerification);
+authRouter.route("/resendotp").post(resenedOTP);
 export default authRouter;

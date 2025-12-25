@@ -268,7 +268,7 @@ export const forgetOTPVerification: Handler = async (
       });
       return;
     }
-    const { OTP:otp, companyPassword } = parsedInput.data;
+    const { OTP: otp, companyPassword } = parsedInput.data;
     const { companyEmail } = req.cookies.otp_data;
     const IsOtpExists = await OTP.find({ companyEmail, type: "forget" })
       .sort({ createdAt: -1 })
@@ -284,7 +284,7 @@ export const forgetOTPVerification: Handler = async (
       { email: companyEmail },
       {
         $set: {
-          companyPassword: bcrypt.hashSync(companyPassword, 10),
+          password: bcrypt.hashSync(companyPassword, 10),
         },
       }
     );
@@ -309,6 +309,81 @@ export const forgetOTPVerification: Handler = async (
       message: err.message || "Something went wrong from our side",
       err,
     });
+    return;
+  }
+};
+export const resenedOTP: Handler = async (req, res): Promise<void> => {
+  try {
+    const otpData = req.cookies.otp_data;
+    if (!otpData || !otpData.companyEmail || !otpData.type) {
+      res.status(StatusCode.InputError).json({
+        message: "Invalid email address",
+      });
+      return;
+    }
+    const isUserExists = await User.findOne({ email: otpData.companyEmail });
+    if (isUserExists) {
+      res
+        .status(StatusCode.DocumentExists)
+        .json({ message: "User already exists with this email" });
+      return;
+    }
+    const isOTPExists = await OTP.findOne({
+      email: otpData.email,
+      type: otpData.type,
+    })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    if (
+      isOTPExists &&
+      new Date().getTime() - new Date(isOTPExists.createdAt).getTime() <= 600000
+    ) {
+      const otpCreatedTime = new Date(isOTPExists.createdAt);
+      if (new Date().getTime() - otpCreatedTime.getTime() <= 120000) {
+        res
+          .status(StatusCode.DocumentExists)
+          .json({ message: "Wait for 2 minutes before sending new OTP" });
+        return;
+      }
+    }
+    const otp = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const newOtp = await OTP.create({
+      companyEmail: otpData.companyEmail,
+      otp: Number(otp),
+      subject: `OTP for user ${otpData.type}`,
+      companyPassword: isOTPExists?.companyPassword,
+      companyName: isOTPExists?.companyName,
+      type: otpData.type,
+      createdAt: new Date(),
+    });
+    if (!newOtp) {
+      res.status(StatusCode.ServerError).json({ message: "OTP not generated" });
+      return;
+    }
+    const cookieOptions: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 20 * 60000, // 20 minutes
+    };
+    res
+      .cookie(
+        "otp_data",
+        { companyEmail: newOtp.companyEmail, type: newOtp.type },
+        cookieOptions
+      )
+      .status(StatusCode.Success)
+      .json({ message: "OTP sent successfully" });
+    return;
+  } catch (err: any) {
+    res
+      .status(StatusCode.ServerError)
+      .json({ message: "Something went wrong from ourside", err });
     return;
   }
 };
