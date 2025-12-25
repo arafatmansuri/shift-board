@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useAppDispatch } from "../hooks";
@@ -86,15 +86,34 @@ const additionalText = {
   },
 };
 
+function convertSecondsToMMSS(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  const formattedMins = mins < 10 ? `0${mins}` : mins.toString();
+  const formattedSecs = secs < 10 ? `0${secs}` : secs.toString();
+  return `${formattedMins}:${formattedSecs}`;
+}
+
 export const Auth = ({ type }: AuthProps) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
     getValues,
-    setValue,
     reset,
   } = useForm<AuthRequest>();
+  const [isResendActive, setIsResendActive] = useState(
+    localStorage.getItem("isResendActive") === "false"
+      ? type === "registerOTP" || type === "forgotOTP"
+        ? false
+        : true
+      : true
+  );
+  const [timer, setTimer] = useState(
+    localStorage.getItem("timer")
+      ? parseInt(localStorage.getItem("timer")!)
+      : 120
+  );
   const companyMutation = useCompanyMutation();
   const loginMutation = useLoginMutation();
   const dispatch = useAppDispatch();
@@ -113,6 +132,12 @@ export const Auth = ({ type }: AuthProps) => {
         method: "POST",
       });
   };
+  const sendOTP = async () => {
+    loginMutation.mutate({
+      endpoint: "resendotp",
+      method: "POST",
+    });
+  };
   function resetForm() {
     reset({
       companyEmail: "",
@@ -123,6 +148,12 @@ export const Auth = ({ type }: AuthProps) => {
     });
     companyMutation.reset();
     loginMutation.reset();
+  }
+  function resetTimer() {
+    setIsResendActive(false);
+    setTimer(120);
+    localStorage.setItem("isResendActive", "false");
+    localStorage.setItem("timer", "120");
   }
   useEffect(() => {
     resetForm();
@@ -137,15 +168,42 @@ export const Auth = ({ type }: AuthProps) => {
       );
       setTimeout(() => {
         resetForm();
+        resetTimer();
+        localStorage.setItem(
+          "mail",
+          companyMutation.variables?.data?.companyEmail ||
+            loginMutation.variables?.data?.companyEmail ||
+            ""
+        );
+        if (loginMutation.variables?.endpoint == "resendotp") {
+          return;
+        }
+        else
         navigate(navigateURLs[type]);
       }, 1000);
     }
   }, [companyMutation.isSuccess, loginMutation.isSuccess]);
+  useEffect(() => {
+    localStorage.setItem("isResendActive", "" + isResendActive);
+    localStorage.setItem("timer", "" + timer);
+    let interval: number | undefined;
+    if (!isResendActive) {
+      interval = setInterval(() => {
+        setTimer((t) => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isResendActive, timer]);
+  if (timer === 0) {
+    setIsResendActive(true);
+    setTimer(120);
+  }
   return (
     <div className="bg-white rounded-xl shadow-lg p-8 pt-4 flex flex-col items-center justify-center sm:w-[70%] md:w-[60%] lg:w-[40%] w-full">
       <button
         onClick={() => {
           resetForm();
+          resetTimer();
           navigate("/");
         }}
         className="flex items-center gap-1 text-gray-600 hover:text-blue-600 transition-colors cursor-pointer self-start mb-3 -ml-5"
@@ -166,8 +224,21 @@ export const Auth = ({ type }: AuthProps) => {
       )}
       {(type == "registerOTP" || type == "forgotOTP") && (
         <p className="text-sm text-center mb-2">
-          OTP has been sent to your registered email. Please enter the OTP
-          {type == "forgotOTP" ? " and your new password to proceed." : "."}
+          OTP has been sent to {localStorage.getItem("mail")}. Please enter the
+          OTP
+          {type == "forgotOTP" ? " and your new password to proceed. " : ". "}
+          <span
+            className="text-blue-500 underline cursor-pointer"
+            onClick={() => {
+              resetForm();
+              resetTimer();
+              if (type == "forgotOTP") {
+                navigate("/forgot-password");
+              } else navigate("/register");
+            }}
+          >
+            (not you?)
+          </span>
         </p>
       )}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 w-full">
@@ -251,10 +322,24 @@ export const Auth = ({ type }: AuthProps) => {
           <Box message={loginMutation.error.message} type="error" />
         )}
         {companyMutation.isSuccess && (
-          <Box message={successMessage[type]} type="success" />
+          <Box
+            message={
+              companyMutation.variables?.endpoint == "resendotp"
+                ? "OTP resent successfully"
+                : successMessage[type]
+            }
+            type="success"
+          />
         )}
         {loginMutation.isSuccess && (
-          <Box message={successMessage[type]} type="success" />
+          <Box
+            message={
+              loginMutation.variables?.endpoint == "resendotp"
+                ? "OTP resent successfully"
+                : successMessage[type]
+            }
+            type="success"
+          />
         )}
         <Button
           isDisabled={companyMutation.isPending || loginMutation.isPending}
@@ -272,19 +357,37 @@ export const Auth = ({ type }: AuthProps) => {
       </form>
 
       <div className="mt-6 text-center">
-        {additionalText[type].question}
-        <button
-          type="reset"
-          // to={additionalText[type].linkTo}
-          className="text-blue-500 underline cursor-pointer"
-          onClick={() => {
-            resetForm();
-            navigate(additionalText[type].linkTo);
-          }}
-          // className="text-sm text-slate-600 hover:text-slate-900"
-        >
-          {additionalText[type].linkText}
-        </button>
+        {type == "forgotOTP" || type == "registerOTP"
+          ? "Resend OTP?"
+          : `${additionalText[type].question}`}{" "}
+        {type !== "forgotOTP" && type !== "registerOTP" && (
+          <button
+            type="reset"
+            // to={additionalText[type].linkTo}
+            className="text-blue-500 underline cursor-pointer"
+            onClick={() => {
+              resetForm();
+              resetTimer();
+              navigate(additionalText[type].linkTo);
+            }}
+            // className="text-sm text-slate-600 hover:text-slate-900"
+          >
+            {additionalText[type].linkText}
+          </button>
+        )}
+        {(type == "forgotOTP" || type == "registerOTP") && isResendActive && (
+          <span
+            className="text-blue-500 underline cursor-pointer"
+            onClick={() => {
+              sendOTP();
+            }}
+          >
+            Resend
+          </span>
+        )}
+        {(type == "forgotOTP" || type == "registerOTP") && !isResendActive && (
+          <span> {convertSecondsToMMSS(timer)}</span>
+        )}
       </div>
     </div>
   );
