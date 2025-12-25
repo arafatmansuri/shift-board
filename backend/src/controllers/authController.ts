@@ -1,13 +1,34 @@
+import bcrypt from "bcrypt";
 import { CookieOptions } from "express";
 import jwt from "jsonwebtoken";
+import otpGenerator from "otp-generator";
 import { z } from "zod";
 import { Company } from "../models/companyModel";
+import { OTP } from "../models/otpModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
 const loginSchema = z.object({
   companyName: z.string({ error: "company name must be string" }).trim(),
   companyEmail: z.email({ error: "Invalid email address" }),
   companyPassword: z.string({ error: "Password must be string" }),
+});
+const forgetInputSchema = z.object({
+  OTP: z.number(),
+  companyPassword: z
+    .string()
+    .regex(/[A-Z]/, {
+      message: "Pasword should include atlist 1 uppercasecharacter",
+    })
+    .regex(/[a-z]/, {
+      message: "Pasword should include atlist 1 lowercasecharacter",
+    })
+    .regex(/[0-9]/, {
+      message: "Pasword should include atlist 1 number character",
+    })
+    .regex(/[^A-Za-z0-9]/, {
+      message: "Pasword should include atlist 1 special character",
+    })
+    .min(8, { message: "Password length shouldn't be less than 8" }),
 });
 export const login: Handler = async (req, res) => {
   try {
@@ -28,7 +49,9 @@ export const login: Handler = async (req, res) => {
         .json({ message: "Company not found", success: false });
       return;
     }
-    const user = await User.findOne({ $and: [{ email: companyEmail }, { company: company._id }] })
+    const user = await User.findOne({
+      $and: [{ email: companyEmail }, { company: company._id }],
+    })
       .select("-refreshToken")
       .populate("company", "-companyPassword");
     if (!user) {
@@ -156,6 +179,136 @@ export const logout: Handler = async (req, res) => {
     res
       .status(StatusCode.ServerError)
       .json({ message: "Something went wrong from ourside", success: false });
+    return;
+  }
+};
+export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
+  try {
+    const userEmail = z.email({ message: "Invalid email address" });
+    const userInput = userEmail.safeParse(req.body.companyEmail);
+    if (!userInput.success) {
+      res.status(StatusCode.InputError).json({
+        message: userInput.error.message || "Invalid email address",
+      });
+      return;
+    }
+    const email = userInput.data;
+    const user = await User.findOne({ email });
+    if (!user) {
+      res
+        .status(StatusCode.DocumentExists)
+        .json({ message: "User not found with this email" });
+      return;
+    }
+    const isOTPExists = await OTP.findOne({
+      companyEmail: email,
+      type: "forget",
+    })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    if (isOTPExists) {
+      const otpCreatedTime = new Date(isOTPExists.createdAt);
+      if (new Date().getTime() - otpCreatedTime.getTime() <= 120000) {
+        res
+          .status(StatusCode.DocumentExists)
+          .json({ message: "Wait for 2 minutes before sending new OTP" });
+        return;
+      }
+    }
+    const otp = otpGenerator.generate(6, {
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
+    const newOtp = await OTP.create({
+      companyEmail: email,
+      otp: Number(otp),
+      subject: "OTP for forget password",
+      companyName: user.username,
+      type: "forget",
+      createdAt: new Date(),
+    });
+    if (!newOtp) {
+      res.status(500).json({ message: "OTP not generated" });
+      return;
+    }
+    const cookieOptions: CookieOptions = {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      path: "/",
+      maxAge: 10 * 60000, // 10 minutes
+    };
+    res
+      .cookie(
+        "otp_data",
+        { companyEmail: newOtp.companyEmail, type: "forget" },
+        cookieOptions
+      )
+      .status(200)
+      .json({ message: "OTP sent successfully" });
+    return;
+  } catch (err: any) {
+    res
+      .status(StatusCode.ServerError)
+      .json({ message: "Something went wrong from ourside", err });
+    return;
+  }
+};
+export const forgetOTPVerification: Handler = async (
+  req,
+  res
+): Promise<void> => {
+  try {
+    const parsedInput = forgetInputSchema.safeParse(req.body);
+    if (!parsedInput.success) {
+      res.status(StatusCode.NotFound).json({
+        message:
+          parsedInput.error.issues[0].message || "OTP/Password is required",
+      });
+      return;
+    }
+    const { OTP:otp, companyPassword } = parsedInput.data;
+    const { companyEmail } = req.cookies.otp_data;
+    const IsOtpExists = await OTP.find({ companyEmail, type: "forget" })
+      .sort({ createdAt: -1 })
+      .limit(1);
+    if (IsOtpExists.length === 0 || otp !== IsOtpExists[0]?.otp) {
+      res.status(StatusCode.NotFound).json({
+        message: "Invalid OTP",
+      });
+      return;
+    }
+    await OTP.deleteMany({ companyEmail, type: "forget" });
+    await User.updateOne(
+      { email: companyEmail },
+      {
+        $set: {
+          companyPassword: bcrypt.hashSync(companyPassword, 10),
+        },
+      }
+    );
+    // const cookieOptions: CookieOptions = {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: "none",
+    //   path: "/",
+    //   maxAge: 24 * 60 * 60 * 1000, // 1 day
+    // };
+    res
+      .status(StatusCode.Success)
+      // .cookie("accessToken", accessToken, cookieOptions)
+      // .cookie("refreshToken", refreshToken, cookieOptions)
+      .json({
+        message: "Password changed successfully",
+        // user,
+      });
+    return;
+  } catch (err: any) {
+    res.status(StatusCode.ServerError).json({
+      message: err.message || "Something went wrong from our side",
+      err,
+    });
     return;
   }
 };

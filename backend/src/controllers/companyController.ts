@@ -138,6 +138,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
           companyPassword: bcrypt.hashSync(companyPassword, 10),
           companyName,
           type: "signup",
+          companySize,
         });
         res
           .cookie(
@@ -145,7 +146,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
             { companyEmail: newOtp.companyEmail, type: "signup" },
             cookieOptions
           )
-          .status(200)
+          .status(StatusCode.Success)
           .json({ message: "OTP sent successfully" });
         return;
       }
@@ -162,9 +163,10 @@ export const createCompanySendOTP: Handler = async (req, res) => {
       companyPassword: bcrypt.hashSync(companyPassword, 10),
       companyName,
       type: "signup",
+      companySize,
     });
     if (!newOtp) {
-      res.status(500).json({ message: "OTP not generated" });
+      res.status(StatusCode.ServerError).json({ message: "OTP not generated" });
       return;
     }
     res
@@ -173,7 +175,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
         { companyEmail: newOtp.companyEmail, type: "signup" },
         cookieOptions
       )
-      .status(200)
+      .status(StatusCode.Success)
       .json({ message: "OTP sent successfully" });
     return;
   } catch (error) {

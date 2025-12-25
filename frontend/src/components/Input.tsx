@@ -1,6 +1,8 @@
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useState, type HTMLInputTypeAttribute } from "react";
+import type { UseFormSetValue } from "react-hook-form";
 import { Link } from "react-router";
+import type { AuthRequest } from "../types";
 
 type InputProps = {
   type?: HTMLInputTypeAttribute;
@@ -10,6 +12,7 @@ type InputProps = {
   isError: boolean;
   errorMessage?: string;
   forgotOption?: boolean;
+  inputVal?: string;
 };
 
 const Input = ({
@@ -20,9 +23,9 @@ const Input = ({
   isError,
   errorMessage,
   forgotOption = false,
+  inputValue,
 }: InputProps) => {
   const [showPassword, setShowPassword] = useState(false);
-  const [inputValue, setInputValue] = useState("");
   return (
     <div className="relative">
       <label
@@ -45,9 +48,6 @@ const Input = ({
         {...formHook}
         className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
         placeholder={placeholder}
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        defaultValue={type == "number" ? undefined : ""}
       />
       {type == "password" && !showPassword && inputValue && (
         <EyeIcon

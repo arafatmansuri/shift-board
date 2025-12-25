@@ -91,6 +91,8 @@ export const Auth = ({ type }: AuthProps) => {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
+    setValue,
     reset,
   } = useForm<AuthRequest>();
   const companyMutation = useCompanyMutation();
@@ -226,6 +228,7 @@ export const Auth = ({ type }: AuthProps) => {
             }}
             type="password"
             forgotOption={type == "login"}
+            inputVal={getValues("companyPassword")}
           />
         )}
         {type == "register" && (
