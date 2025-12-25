@@ -10,7 +10,7 @@ type InputProps = {
   isError: boolean;
   errorMessage?: string;
   forgotOption?: boolean;
-  inputVal?: string;
+  inputValue?: string;
 };
 
 const Input = ({
