@@ -1,8 +1,6 @@
 import { EyeIcon, EyeOff } from "lucide-react";
 import { useState, type HTMLInputTypeAttribute } from "react";
-import type { UseFormSetValue } from "react-hook-form";
 import { Link } from "react-router";
-import type { AuthRequest } from "../types";
 
 type InputProps = {
   type?: HTMLInputTypeAttribute;
