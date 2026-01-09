@@ -149,8 +149,8 @@ export const Auth = ({ type }: AuthProps) => {
     companyMutation.reset();
     loginMutation.reset();
   }
-  function resetTimer() {
-    setIsResendActive(false);
+  function resetTimer(resend: boolean = false) {
+    setIsResendActive(resend);
     setTimer(120);
     localStorage.setItem("isResendActive", "false");
     localStorage.setItem("timer", "120");
@@ -367,7 +367,7 @@ export const Auth = ({ type }: AuthProps) => {
             className="text-blue-500 underline cursor-pointer"
             onClick={() => {
               resetForm();
-              resetTimer();
+              resetTimer(true);
               navigate(additionalText[type].linkTo);
             }}
             // className="text-sm text-slate-600 hover:text-slate-900"
