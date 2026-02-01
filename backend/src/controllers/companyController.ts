@@ -5,7 +5,7 @@ import z from "zod";
 import { Company } from "../models/companyModel";
 import { OTP } from "../models/otpModel";
 import { User } from "../models/userModel";
-import { canResendOTP, getOTPData, saveOTP } from "../services/otpService";
+import { canResendOTP, getOTPData, saveOTP, verifyOTP } from "../services/otpService";
 import { Handler, StatusCode } from "../types";
 import { emailQueue } from "../queues/emailQueue";
 const companySchema = z.object({
@@ -122,7 +122,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
     const isOTPExists = await getOTPData(companyEmail);
     const canResend = await canResendOTP(companyEmail);
     let otp:string;
-    if (isOTPExists && canResend && isOTPExists.otp) {
+    if (isOTPExists && !canResend && isOTPExists.otp) {
       otp = isOTPExists.otp;
     }
     else
@@ -186,8 +186,8 @@ export const createCompanyOTPVerification: Handler = async (
       return;
     }
     const { companyEmail } = req.cookies.otp_data;
-    const IsOtpExists = await getOTPData(companyEmail);
-    if (!IsOtpExists || parsedOTP !== IsOtpExists.otp) {
+    const IsOtpExists = await verifyOTP(companyEmail, parsedOTP.toString(), "signup");
+    if (!IsOtpExists) {
       res.status(StatusCode.NotFound).json({
         message: "Invalid OTP",
       });

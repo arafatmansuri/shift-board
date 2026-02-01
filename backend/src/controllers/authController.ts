@@ -6,7 +6,10 @@ import { z } from "zod";
 import { Company } from "../models/companyModel";
 import { OTP } from "../models/otpModel";
 import { User } from "../models/userModel";
+import { canResendOTP, getOTPData, saveOTP, verifyOTP } from "../services/otpService";
 import { Handler, StatusCode } from "../types";
+import { emailQueue } from "../queues/emailQueue";
+import { c } from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
 const loginSchema = z.object({
   companyName: z.string({ error: "company name must be string" }).trim(),
   companyEmail: z.email({ error: "Invalid email address" }),
@@ -130,7 +133,7 @@ export const refreshAccessToken: Handler = async (req, res) => {
     }
     const decodedRefreshToken = jwt.verify(
       refreshToken,
-      <string>process.env.JWT_REFRESH_TOKEN_SECRET
+      <string>process.env.JWT_REFRESH_TOKEN_SECRET,
     );
     if (!decodedRefreshToken) {
       res
@@ -200,38 +203,35 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
         .json({ message: "User not found with this email" });
       return;
     }
-    const isOTPExists = await OTP.findOne({
-      companyEmail: email,
-      type: "forget",
-    })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    if (isOTPExists) {
-      const otpCreatedTime = new Date(isOTPExists.createdAt);
-      if (new Date().getTime() - otpCreatedTime.getTime() <= 120000) {
-        res
-          .status(StatusCode.DocumentExists)
-          .json({ message: "Wait for 2 minutes before sending new OTP" });
-        return;
-      }
+    const isOTPExists = await getOTPData(email);
+    const canResend = await canResendOTP(email);
+    let otp:string;
+    if (isOTPExists && !canResend && isOTPExists.otp && isOTPExists.otpType === "forgot") {
+      otp = isOTPExists.otp;
     }
-    const otp = otpGenerator.generate(6, {
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
-    const newOtp = await OTP.create({
-      companyEmail: email,
-      otp: Number(otp),
-      subject: "OTP for forget password",
-      companyName: user.username,
-      type: "forget",
-      createdAt: new Date(),
-    });
-    if (!newOtp) {
-      res.status(500).json({ message: "OTP not generated" });
-      return;
+    else {
+      otp = otpGenerator.generate(6, {
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
     }
+    await saveOTP({
+      email,
+      otp,
+      data: {
+        companyEmail: email,
+        companyName: user.username,
+        otpType: "forgot",
+        subject: "OTP for user forget password",
+      },
+    });
+    await emailQueue.add("send-otp", {
+          email,
+          otp,
+          subject: "OTP for user forget password",
+          username: `${user.username}`.replace(" ", ""),
+        });
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
@@ -242,8 +242,8 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
     res
       .cookie(
         "otp_data",
-        { companyEmail: newOtp.companyEmail, type: "forget" },
-        cookieOptions
+        { companyEmail: email, type: "forgot" },
+        cookieOptions,
       )
       .status(200)
       .json({ message: "OTP sent successfully" });
@@ -257,7 +257,7 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
 };
 export const forgetOTPVerification: Handler = async (
   req,
-  res
+  res,
 ): Promise<void> => {
   try {
     const parsedInput = forgetInputSchema.safeParse(req.body);
@@ -270,23 +270,21 @@ export const forgetOTPVerification: Handler = async (
     }
     const { OTP: otp, companyPassword } = parsedInput.data;
     const { companyEmail } = req.cookies.otp_data;
-    const IsOtpExists = await OTP.find({ companyEmail, type: "forget" })
-      .sort({ createdAt: -1 })
-      .limit(1);
-    if (IsOtpExists.length === 0 || otp !== IsOtpExists[0]?.otp) {
+    const IsOtpExists = await verifyOTP(companyEmail, otp.toString(), "forgot");
+    if (!IsOtpExists) {
       res.status(StatusCode.NotFound).json({
         message: "Invalid OTP",
       });
       return;
     }
-    await OTP.deleteMany({ companyEmail, type: "forget" });
+    
     await User.updateOne(
       { email: companyEmail },
       {
         $set: {
           password: bcrypt.hashSync(companyPassword, 10),
         },
-      }
+      },
     );
     // const cookieOptions: CookieOptions = {
     //   httpOnly: true,
@@ -328,42 +326,42 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
         .json({ message: "User does not exist with this email" });
       return;
     }
-    const isOTPExists = await OTP.findOne({
-      email: otpData.email,
-      type: otpData.type,
-    })
-      .sort({ createdAt: -1 })
-      .limit(1);
+    const isOTPExists = await getOTPData(otpData.companyEmail);
+    const canResend = await canResendOTP(otpData.companyEmail);
     if (
-      isOTPExists &&
-      new Date().getTime() - new Date(isOTPExists.createdAt).getTime() <= 600000
+      !isOTPExists ||
+      !canResend ||
+      (isOTPExists && isOTPExists.otpType !== otpData.type)
     ) {
-      const otpCreatedTime = new Date(isOTPExists.createdAt);
-      if (new Date().getTime() - otpCreatedTime.getTime() <= 120000) {
-        res
-          .status(StatusCode.DocumentExists)
-          .json({ message: "Wait for 2 minutes before sending new OTP" });
-        return;
-      }
+      res
+        .status(StatusCode.DocumentExists)
+        .json({ message: "Wait for 2 minutes before sending new OTP" });
+      return;
     }
     const otp = otpGenerator.generate(6, {
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    const newOtp = await OTP.create({
-      companyEmail: otpData.companyEmail,
-      otp: Number(otp),
-      subject: `OTP for user ${otpData.type}`,
-      companyPassword: isOTPExists?.companyPassword,
-      companyName: isOTPExists?.companyName,
-      type: otpData.type,
-      createdAt: new Date(),
+    const {companyEmail, companyName, companyPassword, companySize} = isOTPExists;
+    const newOtp = await saveOTP({
+      email: companyEmail!,
+      otp,
+      data: {
+        companyEmail,
+        companyName,
+        companyPassword,
+        companySize,
+        otpType: otpData.type,
+        subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
+      },
     });
-    if (!newOtp) {
-      res.status(StatusCode.ServerError).json({ message: "OTP not generated" });
-      return;
-    }
+    await emailQueue.add("send-otp", {
+          email: companyEmail,
+          otp,
+          subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
+          username: `${companyName}`.replace(" ", ""),
+        });
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
@@ -374,8 +372,8 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
     res
       .cookie(
         "otp_data",
-        { companyEmail: newOtp.companyEmail, type: newOtp.type },
-        cookieOptions
+        { companyEmail: companyEmail, type: otpData.type },
+        cookieOptions,
       )
       .status(StatusCode.Success)
       .json({ message: "OTP sent successfully" });
