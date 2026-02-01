@@ -4,12 +4,8 @@ import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
 import { Handler, StatusCode } from "../types";
+import { departmentSchema } from "../validations/departmentValidations";
 
-const departmentSchema = z.object({
-  departmentName: z.string().min(2, { error: "Department name is too short" }),
-  departmentCode: z.string(),
-  departmentManager: z.string().optional(),
-});
 export const createDepartment: Handler = async (req, res) => {
   try {
     const parsedDepartment = departmentSchema.safeParse(req.body);

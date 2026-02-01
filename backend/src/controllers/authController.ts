@@ -4,35 +4,17 @@ import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import { z } from "zod";
 import { Company } from "../models/companyModel";
-import { OTP } from "../models/otpModel";
 import { User } from "../models/userModel";
-import { canResendOTP, getOTPData, saveOTP, verifyOTP } from "../services/otpService";
-import { Handler, StatusCode } from "../types";
 import { emailQueue } from "../queues/emailQueue";
-import { c } from "vite/dist/node/moduleRunnerTransport.d-DJ_mE5sf";
-const loginSchema = z.object({
-  companyName: z.string({ error: "company name must be string" }).trim(),
-  companyEmail: z.email({ error: "Invalid email address" }),
-  companyPassword: z.string({ error: "Password must be string" }),
-});
-const forgetInputSchema = z.object({
-  OTP: z.number(),
-  companyPassword: z
-    .string()
-    .regex(/[A-Z]/, {
-      message: "Pasword should include atlist 1 uppercasecharacter",
-    })
-    .regex(/[a-z]/, {
-      message: "Pasword should include atlist 1 lowercasecharacter",
-    })
-    .regex(/[0-9]/, {
-      message: "Pasword should include atlist 1 number character",
-    })
-    .regex(/[^A-Za-z0-9]/, {
-      message: "Pasword should include atlist 1 special character",
-    })
-    .min(8, { message: "Password length shouldn't be less than 8" }),
-});
+import {
+  canResendOTP,
+  getOTPData,
+  saveOTP,
+  verifyOTP,
+} from "../services/otpService";
+import { Handler, StatusCode } from "../types";
+import { forgetInputSchema, loginSchema } from "../validations/authValidations";
+
 export const login: Handler = async (req, res) => {
   try {
     const loginParse = loginSchema.safeParse(req.body);
@@ -205,11 +187,15 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
     }
     const isOTPExists = await getOTPData(email);
     const canResend = await canResendOTP(email);
-    let otp:string;
-    if (isOTPExists && !canResend && isOTPExists.otp && isOTPExists.otpType === "forgot") {
+    let otp: string;
+    if (
+      isOTPExists &&
+      !canResend &&
+      isOTPExists.otp &&
+      isOTPExists.otpType === "forgot"
+    ) {
       otp = isOTPExists.otp;
-    }
-    else {
+    } else {
       otp = otpGenerator.generate(6, {
         lowerCaseAlphabets: false,
         upperCaseAlphabets: false,
@@ -227,11 +213,11 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
       },
     });
     await emailQueue.add("send-otp", {
-          email,
-          otp,
-          subject: "OTP for user forget password",
-          username: `${user.username}`.replace(" ", ""),
-        });
+      email,
+      otp,
+      subject: "OTP for user forget password",
+      username: `${user.username}`.replace(" ", ""),
+    });
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
@@ -277,7 +263,7 @@ export const forgetOTPVerification: Handler = async (
       });
       return;
     }
-    
+
     await User.updateOne(
       { email: companyEmail },
       {
@@ -343,7 +329,8 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    const {companyEmail, companyName, companyPassword, companySize} = isOTPExists;
+    const { companyEmail, companyName, companyPassword, companySize } =
+      isOTPExists;
     const newOtp = await saveOTP({
       email: companyEmail!,
       otp,
@@ -357,11 +344,11 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
       },
     });
     await emailQueue.add("send-otp", {
-          email: companyEmail,
-          otp,
-          subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
-          username: `${companyName}`.replace(" ", ""),
-        });
+      email: companyEmail,
+      otp,
+      subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
+      username: `${companyName}`.replace(" ", ""),
+    });
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,

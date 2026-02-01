@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import z from "zod";
 import { Company } from "../models/companyModel";
 import { Shift } from "../models/shiftModel";
 import { User } from "../models/userModel";
@@ -8,12 +7,7 @@ import {
   timeToMinutes,
 } from "../services/calculateShiftDuration";
 import { Handler, StatusCode } from "../types";
-const shiftSchema = z.object({
-  employeeId: z.string({ error: "Invalid employeeId" }),
-  date: z.iso.date({ error: "Invalid shift date" }),
-  startTime: z.string("Invalid start time"),
-  endTime: z.string("Invalid end time"),
-});
+import { shiftSchema } from "../validations/shiftValidations";
 
 export const createShift: Handler = async (req, res) => {
   try {
@@ -190,7 +184,7 @@ export const updateShift: Handler = async (req, res) => {
           employeeId: employee._id,
         },
       },
-      { new: true }
+      { new: true },
     ).populate("employeeId");
     res.status(StatusCode.Created).json({
       message: "Shift created successfully",
@@ -219,7 +213,7 @@ export const getAllShifts: Handler = async (req, res) => {
       return;
     }
     let shifts = await Shift.find({ company: company._id }).populate(
-      "employeeId"
+      "employeeId",
     );
     if (employee && !date) {
       shifts = await Shift.find({
