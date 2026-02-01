@@ -102,83 +102,85 @@ export const Shifts = () => {
   };
 
   return (
-    <div className="p-8">
-      <div className="mb-8 flex justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Shifts</h1>
-          <p className="text-slate-600">Manage employee work schedules</p>
-        </div>
-        <Menu
-          className="mt-2 md:hidden"
-          onClick={() => {
-            dispatch(toggleSidebar());
-          }}
-        />
-      </div>
-
-      {user?.role === "admin" && (
-        <div className="mb-6 flex flex-wrap gap-4">
-          <Button
-            text="Create Shift"
-            varient="primary"
-            startIcon={<Plus className="w-4 h-4" />}
-            onClick={() => navigate("/dashboard/shifts/create")}
+    <div className="p-8 bg-slate-50">
+      <div className="bg-slate-50 sticky top-0 z-20 py-4">
+        <div className="mb-8 flex justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">Shifts</h1>
+            <p className="text-slate-600">Manage employee work schedules</p>
+          </div>
+          <Menu
+            className="mt-2 md:hidden"
+            onClick={() => {
+              dispatch(toggleSidebar());
+            }}
           />
-          <div className="flex-col md:flex-row items-center gap-2">
-            <Filter className="w-5 h-5 text-slate-600 hidden md:inline md:mr-2" />
-            <input
-              type="date"
-              value={filterDate}
-              onChange={(e) => {
-                setFilterDate(e.target.value);
-                setEndpoint(
-                  `shifts/${
-                    typeof user?.company == "object" ? user.company._id : ""
-                  }?employee=${filterEmployee}&date=${e.target.value}`
-                );
-                // refetchShifts();
-              }}
-              className="md:px-4 md:py-2 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 mb-2 md:mb-0 md:mr-2"
-              placeholder="Filter by date"
+        </div>
+
+        {user?.role === "admin" && (
+          <div className="mb-2 flex flex-wrap gap-4">
+            <Button
+              text="Create Shift"
+              varient="primary"
+              startIcon={<Plus className="w-4 h-4" />}
+              onClick={() => navigate("/dashboard/shifts/create")}
             />
-            <select
-              value={filterEmployee}
-              onChange={(e) => {
-                setFilterEmployee(e.target.value);
-                setEndpoint(
-                  `shifts/${
-                    typeof user?.company == "object" ? user.company._id : ""
-                  }?employee=${e.target.value}&date=${filterDate}`
-                );
-              }}
-              className="md:px-4 md:py-2 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 mb-2 md:mb-0"
-            >
-              <option value="">All Employees</option>
-              {employees.map((emp: User) => (
-                <option key={emp._id} value={emp._id}>
-                  {emp.username} ({emp.employeeCode})
-                </option>
-              ))}
-            </select>
-            {(filterDate || filterEmployee) && (
-              <button
-                onClick={() => {
-                  setFilterDate("");
-                  setFilterEmployee("");
+            <div className="flex-col md:flex-row items-center gap-2">
+              <Filter className="w-5 h-5 text-slate-600 hidden md:inline md:mr-2" />
+              <input
+                type="date"
+                value={filterDate}
+                onChange={(e) => {
+                  setFilterDate(e.target.value);
                   setEndpoint(
                     `shifts/${
                       typeof user?.company == "object" ? user.company._id : ""
-                    }`
+                    }?employee=${filterEmployee}&date=${e.target.value}`,
+                  );
+                  // refetchShifts();
+                }}
+                className="md:px-4 md:py-2 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 mb-2 md:mb-0 md:mr-2"
+                placeholder="Filter by date"
+              />
+              <select
+                value={filterEmployee}
+                onChange={(e) => {
+                  setFilterEmployee(e.target.value);
+                  setEndpoint(
+                    `shifts/${
+                      typeof user?.company == "object" ? user.company._id : ""
+                    }?employee=${e.target.value}&date=${filterDate}`,
                   );
                 }}
-                className="px-4 py-2 text-slate-600 hover:text-slate-900 cursor-pointer"
+                className="md:px-4 md:py-2 px-2 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 mb-2 md:mb-0"
               >
-                Clear
-              </button>
-            )}
+                <option value="">All Employees</option>
+                {employees.map((emp: User) => (
+                  <option key={emp._id} value={emp._id}>
+                    {emp.username} ({emp.employeeCode})
+                  </option>
+                ))}
+              </select>
+              {(filterDate || filterEmployee) && (
+                <button
+                  onClick={() => {
+                    setFilterDate("");
+                    setFilterEmployee("");
+                    setEndpoint(
+                      `shifts/${
+                        typeof user?.company == "object" ? user.company._id : ""
+                      }`,
+                    );
+                  }}
+                  className="px-4 py-2 text-slate-600 hover:text-slate-900 cursor-pointer"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {shiftsLoading ? (
         <div className="text-center py-12 text-slate-600">

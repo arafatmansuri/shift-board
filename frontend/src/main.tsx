@@ -16,7 +16,17 @@ import { Employees } from "./pages/Employee.tsx";
 import { Shifts } from "./pages/Shifts.tsx";
 import { store } from "./store/index.ts";
 import UnauthorizedLayout from "./layouts/UnauthotizedLayout.tsx";
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      cacheTime: 30 * 60 * 1000, // 30 minutes
+    },
+  },
+});
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>

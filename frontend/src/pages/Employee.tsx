@@ -69,25 +69,28 @@ export const Employees = () => {
 
   return (
     <div className="md:p-8 p-4">
-      <div className="mb-8 flex justify-between">
-        <div className="">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Employees</h1>
-          <p className="text-slate-600">Manage your workforce</p>
+      <div className="bg-slate-50 sticky top-0 z-20 py-4">
+        <div className="mb-5 flex justify-between">
+          <div className="">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">
+              Employees
+            </h1>
+            <p className="text-slate-600">Manage your workforce</p>
+          </div>
+          <Menu
+            className="mt-2 md:hidden"
+            onClick={() => {
+              dispatch(toggleSidebar());
+            }}
+          />
         </div>
-        <Menu
-          className="mt-2 md:hidden"
-          onClick={() => {
-            dispatch(toggleSidebar());
-          }}
-        />
-      </div>
 
-      <div className="mb-6">
         <Button
           text="Add Employee"
           varient="primary"
           startIcon={<Plus className="w-4 h-4" />}
           onClick={() => navigate("/dashboard/employees/create")}
+          classes="mb-2"
         />
       </div>
 

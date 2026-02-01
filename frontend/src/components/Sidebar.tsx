@@ -40,8 +40,8 @@ export const Sidebar = () => {
   const sidebar = useAppSelector((state) => state.sidebar);
   return (
     <div
-      className={`w-64 bg-white border-r border-slate-200 md:flex flex-col h-screen ${
-        sidebar && !isDesktop ? "flex fixed right-0" : "hidden"
+      className={`w-64 bg-white border-r border-slate-200 md:flex flex-col h-screen z-20 ${
+        sidebar && !isDesktop ? "flex fixed right-0 z-10" : "hidden"
       }`}
     >
       <div className="p-6 border-b border-slate-200">

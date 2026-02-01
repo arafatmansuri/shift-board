@@ -100,7 +100,8 @@ export const Departments = () => {
 
   return (
     <div className="md:p-8 p-5">
-      <div className="mb-8 flex justify-between">
+      <div className="bg-slate-50 sticky top-0 z-20 py-4">
+        <div className="mb-8 flex justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Departments
@@ -117,14 +118,15 @@ export const Departments = () => {
         />
       </div>
 
-      <div className="mb-6">
+      
         <Button
           text="Create Department"
           varient="primary"
           startIcon={<Plus className="w-4 h-4" />}
           onClick={() => navigate("/dashboard/departments/create")}
+          classes="mb-2"
         />
-      </div>
+    </div>
 
       {isLoading ? (
         <div className="text-center py-12 text-slate-600">
