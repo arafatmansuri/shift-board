@@ -1,0 +1,22 @@
+{
+	"name": "shiftboard-backend",
+	"main": "src/index.ts",
+	"compatibility_date": "2026-11-04",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"queues": {
+		"producers": [
+			{
+				"queue": "shiftboard-mailer-queue",
+				"binding": "shiftboard_mailer_queue"
+			}
+		]
+	},
+	"kv_namespaces": [
+		{
+			"binding": "sf_kv",
+			"id": "9cdc120063a1443a9bd92b19a25512d9"
+		}
+	]
+}

@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { connectDB } from ".";
 import { Company } from "../models/companyModel";
 import { User } from "../models/userModel";

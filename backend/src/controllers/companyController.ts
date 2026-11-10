@@ -1,13 +1,16 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import { env } from "cloudflare:workers";
 import { CookieOptions } from "express";
 import otpGenerator from "otp-generator";
-import z from "zod";
 import { Company } from "../models/companyModel";
-import { OTP } from "../models/otpModel";
 import { User } from "../models/userModel";
-import { canResendOTP, getOTPData, saveOTP, verifyOTP } from "../services/otpService";
+import {
+  canResendOTP,
+  getOTPData,
+  saveOTP,
+  verifyOTP,
+} from "../services/kvService";
 import { Handler, StatusCode } from "../types";
-import { emailQueue } from "../queues/emailQueue";
 import { companySchema } from "../validations/companyValidations";
 
 export const createCompany: Handler = async (req, res) => {
@@ -103,35 +106,32 @@ export const createCompanySendOTP: Handler = async (req, res) => {
     }
     const isOTPExists = await getOTPData(companyEmail);
     const canResend = await canResendOTP(companyEmail);
-    let otp:string;
+    let otp: string;
     if (isOTPExists && !canResend && isOTPExists.otp) {
       otp = isOTPExists.otp;
-    }
-    else
-     otp = otpGenerator.generate(6, {
-      lowerCaseAlphabets: false,
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
-    await saveOTP({
-      email: companyEmail,
-      otp,
-      data: {
-        companyEmail,
-        companyName,
-        companyPassword: await bcrypt.hash(companyPassword, 10),
-        companySize,
-        otpType: "signup",
-        subject: "OTP for user signup",
-      },
+    } else
+      otp = otpGenerator.generate(6, {
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+    await saveOTP(companyEmail, {
+      companyEmail,
+      companyName,
+      companyPassword: await bcrypt.hash(companyPassword, 10),
+      companySize,
+      otpType: "signup",
+      subject: "OTP for user signup",
+      otp: bcrypt.hashSync(otp, 10),
     });
 
-    await emailQueue.add("send-otp", {
-      email: companyEmail,
-      otp,
-      subject: "OTP for user signup",
-      username: `Admin@${companyName}`.replace(" ", ""),
-    });
+    // await emailQueue.add("send-otp", {
+    //   email: companyEmail,
+    //   otp,
+    //   subject: "OTP for user signup",
+    //   username: `Admin@${companyName}`.replace(" ", ""),
+    // });
+    await env.shiftboard_mailer_queue.send(companyEmail);
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
@@ -140,11 +140,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
       maxAge: 20 * 60000, // 20 minutes
     };
     res
-      .cookie(
-        "otp_data",
-        {type: "signup", companyEmail},
-        cookieOptions
-      )
+      .cookie("otp_data", { type: "signup", companyEmail }, cookieOptions)
       .status(StatusCode.Success)
       .json({ message: "OTP sent successfully" });
     return;
@@ -159,7 +155,7 @@ export const createCompanySendOTP: Handler = async (req, res) => {
 };
 export const createCompanyOTPVerification: Handler = async (
   req,
-  res
+  res,
 ): Promise<void> => {
   try {
     const parsedOTP = req.body.OTP;
@@ -168,7 +164,11 @@ export const createCompanyOTPVerification: Handler = async (
       return;
     }
     const { companyEmail } = req.cookies.otp_data;
-    const IsOtpExists = await verifyOTP(companyEmail, parsedOTP.toString(), "signup");
+    const IsOtpExists = await verifyOTP(
+      companyEmail,
+      parsedOTP.toString(),
+      "signup",
+    );
     if (!IsOtpExists) {
       res.status(StatusCode.NotFound).json({
         message: "Invalid OTP",
@@ -188,7 +188,6 @@ export const createCompanyOTPVerification: Handler = async (
       password: IsOtpExists.companyPassword,
       role: "admin",
     });
-    await OTP.deleteMany({ companyEmail, type: "signup" });
     const { accessToken, refreshToken } =
       newUser.generateAccessAndRefreshToken();
     const user = await User.findByIdAndUpdate(newUser._id, {

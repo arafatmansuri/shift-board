@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import z from "zod";
 import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
@@ -34,7 +33,7 @@ export const createEmployee: Handler = async (req, res) => {
       return;
     }
     const department = await Department.findById(
-      parsedEmployee.data.department
+      parsedEmployee.data.department,
     );
     if (!department) {
       res
@@ -80,7 +79,7 @@ export const createEmployee: Handler = async (req, res) => {
 };
 export const getAllEmployee: Handler = async (req, res) => {
   try {
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const companyId = new Types.ObjectId(req.params.companyId as string);
     const company = await Company.findById(companyId);
     if (!company) {
       res
@@ -108,7 +107,7 @@ export const getAllEmployee: Handler = async (req, res) => {
 };
 export const deleteEmployee: Handler = async (req, res) => {
   try {
-    const id = req.params.id;
+    const id = req.params.id as string;
     const employee = await User.findByIdAndDelete(id);
     if (!employee) {
       res.status(StatusCode.NotFound).json({

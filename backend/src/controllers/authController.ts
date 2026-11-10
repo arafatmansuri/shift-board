@@ -1,17 +1,22 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
+import { env } from "cloudflare:workers";
 import { CookieOptions } from "express";
 import jwt from "jsonwebtoken";
+import { Connection } from "mongoose";
 import otpGenerator from "otp-generator";
 import { z } from "zod";
-import { Company } from "../models/companyModel";
-import { User } from "../models/userModel";
-import { emailQueue } from "../queues/emailQueue";
+import { getCompanyModel } from "../models/companyModel";
+import { getUserModel } from "../models/userModel";
+import {
+  comparePassword,
+  generateAccessAndRefreshToken,
+} from "../services/authService";
 import {
   canResendOTP,
   getOTPData,
   saveOTP,
   verifyOTP,
-} from "../services/otpService";
+} from "../services/kvService";
 import { Handler, StatusCode } from "../types";
 import { forgetInputSchema, loginSchema } from "../validations/authValidations";
 
@@ -27,6 +32,15 @@ export const login: Handler = async (req, res) => {
       return;
     }
     const { companyPassword, companyEmail, companyName } = loginParse.data;
+    const connection = res.locals.connection as Connection;
+    if (!connection) {
+      res.status(StatusCode.ServerError).json({
+        message: "Database connection not found",
+        success: false,
+      });
+      return;
+    }
+    const Company = getCompanyModel(connection);
     const company = await Company.findOne({ companyName });
     if (!company) {
       res
@@ -34,6 +48,7 @@ export const login: Handler = async (req, res) => {
         .json({ message: "Company not found", success: false });
       return;
     }
+    const User = getUserModel(connection);
     const user = await User.findOne({
       $and: [{ email: companyEmail }, { company: company._id }],
     })
@@ -45,14 +60,20 @@ export const login: Handler = async (req, res) => {
         .json({ message: "User not found", success: false });
       return;
     }
-    const isPasswordCorrect = user.comparePassword(companyPassword);
+    const isPasswordCorrect = comparePassword(
+      companyPassword,
+      user.password as string,
+    );
     if (!isPasswordCorrect) {
       res
         .status(StatusCode.NotFound)
         .json({ message: "Incorrect password", success: false });
       return;
     }
-    const { accessToken, refreshToken } = user.generateAccessAndRefreshToken();
+    const { accessToken, refreshToken } = generateAccessAndRefreshToken(
+      user._id.toString(),
+      user.username,
+    );
     await User.findByIdAndUpdate(user._id, {
       $set: {
         refreshToken,
@@ -83,6 +104,7 @@ export const login: Handler = async (req, res) => {
 export const me: Handler = async (req, res) => {
   try {
     const _id = req._id;
+    const User = getUserModel(res.locals.connection as Connection);
     const user = await User.findById(_id)
       .select("-password -refreshToken")
       .populate("company", "-companyPassword")
@@ -123,6 +145,7 @@ export const refreshAccessToken: Handler = async (req, res) => {
         .json({ message: "Unauthorized", success: false });
       return;
     }
+    const User = getUserModel(res.locals.connection as Connection);
     //@ts-ignore
     const user = await User.findById(decodedRefreshToken._id)
       .select("-password -refreshToken")
@@ -133,7 +156,10 @@ export const refreshAccessToken: Handler = async (req, res) => {
         .json({ message: "Unauthorized", success: false });
       return;
     }
-    const { accessToken } = user.generateAccessAndRefreshToken();
+    const { accessToken } = generateAccessAndRefreshToken(
+      user._id.toString(),
+      user.username,
+    );
     const cookieOptions: CookieOptions = {
       sameSite: "none",
       secure: true,
@@ -178,6 +204,7 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
       return;
     }
     const email = userInput.data;
+    const User = getUserModel(res.locals.connection as Connection);
     const user = await User.findOne({ email });
     if (!user) {
       res
@@ -202,22 +229,20 @@ export const forgetSendOTP: Handler = async (req, res): Promise<void> => {
         specialChars: false,
       });
     }
-    await saveOTP({
-      email,
-      otp,
-      data: {
-        companyEmail: email,
-        companyName: user.username,
-        otpType: "forgot",
-        subject: "OTP for user forget password",
-      },
+    await saveOTP(email, {
+      companyEmail: email,
+      companyName: user.username,
+      otpType: "forgot",
+      subject: "OTP for user forget password",
+      otp: otp,
     });
-    await emailQueue.add("send-otp", {
+    /*await emailQueue.add("send-otp", {
       email,
       otp,
       subject: "OTP for user forget password",
       username: `${user.username}`.replace(" ", ""),
-    });
+    });*/
+    await env.shiftboard_mailer_queue.send(email);
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,
@@ -256,14 +281,14 @@ export const forgetOTPVerification: Handler = async (
     }
     const { OTP: otp, companyPassword } = parsedInput.data;
     const { companyEmail } = req.cookies.otp_data;
-    const IsOtpExists = await verifyOTP(companyEmail, otp.toString(), "forgot");
+    const IsOtpExists = await verifyOTP(otp.toString(), companyEmail, "forgot");
     if (!IsOtpExists) {
       res.status(StatusCode.NotFound).json({
         message: "Invalid OTP",
       });
       return;
     }
-
+    const User = getUserModel(res.locals.connection as Connection);
     await User.updateOne(
       { email: companyEmail },
       {
@@ -298,6 +323,12 @@ export const forgetOTPVerification: Handler = async (
 };
 export const resenedOTP: Handler = async (req, res): Promise<void> => {
   try {
+    if (!req.cookies.otp_data) {
+      res.status(StatusCode.InputError).json({
+        message: "Resend OTP request is invalid, please try again",
+      });
+      return;
+    }
     const otpData = req.cookies.otp_data;
     if (!otpData || !otpData.companyEmail || !otpData.type) {
       res.status(StatusCode.InputError).json({
@@ -305,6 +336,7 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
       });
       return;
     }
+    const User = getUserModel(res.locals.connection as Connection);
     const isUserExists = await User.findOne({ email: otpData.companyEmail });
     if (!isUserExists) {
       res
@@ -331,24 +363,22 @@ export const resenedOTP: Handler = async (req, res): Promise<void> => {
     });
     const { companyEmail, companyName, companyPassword, companySize } =
       isOTPExists;
-    const newOtp = await saveOTP({
-      email: companyEmail!,
-      otp,
-      data: {
-        companyEmail,
-        companyName,
-        companyPassword,
-        companySize,
-        otpType: otpData.type,
-        subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
-      },
+    const newOtp = await saveOTP(companyEmail!, {
+      companyEmail,
+      companyName,
+      companyPassword,
+      companySize,
+      otp: bcrypt.hashSync(otp, 10),
+      otpType: otpData.type,
+      subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forgot password"}`,
     });
-    await emailQueue.add("send-otp", {
-      email: companyEmail,
-      otp,
-      subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
-      username: `${companyName}`.replace(" ", ""),
-    });
+    // await emailQueue.add("send-otp", {
+    //   email: companyEmail,
+    //   otp,
+    //   subject: `OTP for user ${otpData.type == "signup" ? "signup" : "forget password"}`,
+    //   username: `${companyName}`.replace(" ", ""),
+    // });
+    await env.shiftboard_mailer_queue.send(companyEmail!);
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: true,

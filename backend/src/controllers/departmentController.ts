@@ -1,5 +1,4 @@
 import { Types } from "mongoose";
-import z from "zod";
 import { Company } from "../models/companyModel";
 import { Department } from "../models/departmentModel";
 import { User } from "../models/userModel";
@@ -71,7 +70,7 @@ export const createDepartment: Handler = async (req, res) => {
 };
 export const getAllDepartment: Handler = async (req, res) => {
   try {
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const companyId = new Types.ObjectId(req.params.companyId as string);
     const company = await Company.findById(companyId);
     if (!company) {
       res
@@ -81,7 +80,7 @@ export const getAllDepartment: Handler = async (req, res) => {
     }
     const departments = await Department.find({ company: companyId }).populate(
       "departmentManager",
-      "-password -refreshToken"
+      "-password -refreshToken",
     );
     res.status(StatusCode.Success).json({
       message: "Departments fetched sucessfully",
@@ -124,7 +123,7 @@ export const deleteDepartment: Handler = async (req, res) => {
 
 export const assignManager: Handler = async (req, res) => {
   try {
-    const departmentId = new Types.ObjectId(req.params.id);
+    const departmentId = new Types.ObjectId(req.params.id as string);
     const employeeId = req.body.departmentManager;
     if (!departmentId || !employeeId) {
       res
@@ -150,7 +149,7 @@ export const assignManager: Handler = async (req, res) => {
           departmentManager: employee._id,
         },
       },
-      { new: true }
+      { new: true },
     );
     if (!department) {
       res.status(StatusCode.NotFound).json({ message: "Invalid department" });

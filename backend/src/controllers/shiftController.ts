@@ -200,11 +200,10 @@ export const updateShift: Handler = async (req, res) => {
     return;
   }
 };
-
 export const getAllShifts: Handler = async (req, res) => {
   try {
     const { employee, date } = req.query;
-    const companyId = new Types.ObjectId(req.params.companyId);
+    const companyId = new Types.ObjectId(req.params.companyId as string);
     const company = await Company.findById(companyId);
     if (!company) {
       res
@@ -217,7 +216,7 @@ export const getAllShifts: Handler = async (req, res) => {
     );
     if (employee && !date) {
       shifts = await Shift.find({
-        employeeId: employee,
+        employeeId: new Types.ObjectId(employee as string),
         company: company._id,
       }).populate("employeeId");
     } else if (!employee && date) {
@@ -234,7 +233,7 @@ export const getAllShifts: Handler = async (req, res) => {
     } else if (employee && date) {
       shifts = (
         await Shift.find({
-          employeeId: employee,
+          employeeId: new Types.ObjectId(employee as string),
           company: company._id,
         }).populate("employeeId")
       ).filter((s) => {
